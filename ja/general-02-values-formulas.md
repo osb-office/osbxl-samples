@@ -54,21 +54,18 @@ java -cp osbxl-1.5.0.jar:javacpp-1.5.14.jar:. Main
 #### [PHP]
 
 ```bash
-# HP (osb-office.com/files/php/) から PHP バージョン(8.2〜8.5)と OS に合う
-# tarball または composer zip をダウンロードする
-# 例: phposbxl-1.5.0-php8.5-nts-linux-x86\_64.tar.gz (Linux・PHP 8.5 の場合)
-# 展開して composer の path リポジトリに指定し導入する
-composer config repositories.mdosbxl path /path/to/phposbxl-1.5.0-php8.5-nts-linux-x86\_64
+# HPからダウンロードした適切なOS・PHPバージョンのzipを作業ディレクトリへ配置
+# (例: ~/phposbxl-test に配置した場合)
+composer config repositories.phposbxl artifact ~/phposbxl-test/
 composer require osb-office/phposbxl
-# composer zip の場合: zip を置いたディレクトリを artifact リポジトリに指定
-# composer config repositories.mdosbxl artifact /path/to/zip-dir && composer require osb-office/phposbxl
+vendor/bin/phposbxl-install
 ```
 
 #### [WebAssembly]
 
 ```bash
-# パッケージを展開（osbxl\_wasm.js / osbxl\_em.js / license/ を含む）
-tar xzf wasmosbxl-1.5.0.tgz
+# パッケージをインストール
+npm install wasmosbxl-1.5.0.tgz
 ```
 ```javascript
 // 読み込み例（Node.js 24〜 必須: この wasm は MEMORY64 = Wasm 3.0 ビルドです）

@@ -46,21 +46,18 @@ java -cp osbxl-1.5.0.jar:javacpp-1.5.14.jar:. Main
 #### [PHP]
 
 ```bash
-# Download the tarball or Composer zip for your PHP version (8.2-8.5) and OS
-# from osb-office.com/files/php/
-# e.g. phposbxl-1.5.0-php8.5-nts-linux-x86\_64.tar.gz (Linux, PHP 8.5)
-# Extract it and install via composer with the extracted dir as a path repository
-composer config repositories.mdosbxl path /path/to/phposbxl-1.5.0-php8.5-nts-linux-x86\_64
+# Place the downloaded .zip matching your OS and PHP version into the working directory
+# (e.g. ~/phposbxl-test)
+composer config repositories.phposbxl artifact ~/phposbxl-test/
 composer require osb-office/phposbxl
-# For the Composer zip: use the dir containing the zip as an artifact repository
-# composer config repositories.mdosbxl artifact /path/to/zip-dir && composer require osb-office/phposbxl
+vendor/bin/phposbxl-install
 ```
 
 #### [WebAssembly]
 
 ```bash
-# Unpack the package (contains osbxl\_wasm.js / osbxl\_em.js / license/)
-tar xzf wasmosbxl-1.5.0.tgz
+# Install the package
+npm install wasmosbxl-1.5.0.tgz
 ```
 ```javascript
 // Loading example (requires Node.js 24+: this wasm is a MEMORY64 = Wasm 3.0 build)
