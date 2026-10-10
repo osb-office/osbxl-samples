@@ -1,5 +1,7 @@
 # osbxl-samples
 
+> **[🇯🇵 日本語版の README はこちら (README.ja.md)](README.ja.md)**
+
 Official verified code samples and patterns for **[osbxl (https://osb-office.com)](https://osb-office.com/)** — an AI-ready, ultra-fast C++ core multi-platform spreadsheet calculation and Excel generation engine.
 
 [![Official Website](https://img.shields.io/badge/Official_Website-osb--office.com-blue?style=flat-square)](https://osb-office.com/)
