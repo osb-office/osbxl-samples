@@ -1,6 +1,6 @@
 # チャート（グラフ）の基本 — 追加・タイトル・型・系列/軸の読み戻し・削除
 
-level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-10-charts.md)
+level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-10-charts.md)
 
 ## やりたいこと
 

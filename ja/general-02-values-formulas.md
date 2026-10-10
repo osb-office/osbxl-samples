@@ -1,6 +1,6 @@
 # 値と数式を入れて表を作る
 
-level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-02-values-formulas.md)
+level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-02-values-formulas.md)
 
 ## やりたいこと
 

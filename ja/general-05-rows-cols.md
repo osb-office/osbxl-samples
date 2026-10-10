@@ -1,6 +1,6 @@
 # 行・列・セル範囲の操作 — 挿入・削除・クリア・コピー
 
-level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-05-rows-cols.md)
+level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-05-rows-cols.md)
 
 ## やりたいこと
 

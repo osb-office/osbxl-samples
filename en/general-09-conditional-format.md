@@ -1,6 +1,6 @@
 # Conditional Formatting — rules, scales, data bars
 
-level: intermediate ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](/ja/general-09-conditional-format.md)
+level: intermediate ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-09-conditional-format.md)
 
 ## What you want to do
 

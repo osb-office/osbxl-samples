@@ -1,4 +1,4 @@
-[English](/en/sample/)
+[English](../en/index.md)
 
 # osbxl サンプル集
 

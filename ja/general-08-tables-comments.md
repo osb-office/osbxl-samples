@@ -1,6 +1,6 @@
 # テーブル（ListObject）とコメント — 作成・集計行・構造化参照・メモ
 
-level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-08-tables-comments.md)
+level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-08-tables-comments.md)
 
 ## やりたいこと
 

@@ -1,6 +1,6 @@
 # 大量データの一括投入 — setValueArray / setFormulaArray
 
-level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-06-bulk-input.md)
+level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-06-bulk-input.md)
 
 ## やりたいこと
 

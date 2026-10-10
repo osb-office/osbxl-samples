@@ -1,6 +1,6 @@
 # Value Types and Number Formats — text, numbers, dates
 
-level: basic ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](/ja/general-04-value-types.md)
+level: basic ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-04-value-types.md)
 
 ## What you want to do
 

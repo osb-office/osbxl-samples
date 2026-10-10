@@ -1,6 +1,6 @@
 # セル値の型と表示書式 — 文字列・数値・日付・時刻・真偽値
 
-level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-04-value-types.md)
+level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-04-value-types.md)
 
 ## やりたいこと
 

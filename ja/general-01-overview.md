@@ -1,6 +1,6 @@
 # 概要 — オブジェクトモデルと基本の流れ
 
-level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-01-overview.md)
+level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-01-overview.md)
 
 ## やりたいこと
 

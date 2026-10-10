@@ -1,6 +1,6 @@
 # 条件付き書式 — セル値ルール・カラースケール・データバー・上位 N 件
 
-level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-09-conditional-format.md)
+level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-09-conditional-format.md)
 
 ## やりたいこと
 

@@ -1,6 +1,6 @@
 # AutoFilter and Sorting — filter, sort, read back
 
-level: intermediate ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](/ja/general-07-autofilter-sort.md)
+level: intermediate ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-07-autofilter-sort.md)
 
 ## What you want to do
 

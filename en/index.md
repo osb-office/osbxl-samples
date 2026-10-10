@@ -1,4 +1,4 @@
-[日本語](/sample/)
+[日本語](../ja/index.md)
 
 # osbxl Sample Collection
 

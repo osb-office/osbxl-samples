@@ -1,6 +1,6 @@
 # ブックとワークシートの操作 — 追加・削除・移動・リネーム
 
-level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-03-sheets.md)
+level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-03-sheets.md)
 
 ## やりたいこと
 

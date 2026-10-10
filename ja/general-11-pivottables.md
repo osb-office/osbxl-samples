@@ -1,6 +1,6 @@
 # ピボットテーブル — 作成・集計・集計方法変更・削除
 
-level: advanced ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-11-pivottables.md)
+level: advanced ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-11-pivottables.md)
 
 ## やりたいこと
 

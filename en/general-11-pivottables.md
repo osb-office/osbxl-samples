@@ -1,6 +1,6 @@
 # Pivot Tables — create, aggregate, delete
 
-level: advanced ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](/ja/general-11-pivottables.md)
+level: advanced ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-11-pivottables.md)
 
 ## What you want to do
 

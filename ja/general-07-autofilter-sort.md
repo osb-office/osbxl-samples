@@ -1,6 +1,6 @@
 # オートフィルターと並べ替え — 条件フィルター・ソート・条件の読み戻し
 
-level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](/en/general-07-autofilter-sort.md)
+level: intermediate ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-07-autofilter-sort.md)
 
 ## やりたいこと
 

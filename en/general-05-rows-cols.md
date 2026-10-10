@@ -1,6 +1,6 @@
 # Rows, Columns and Ranges — insert, delete, copy
 
-level: basic ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](/ja/general-05-rows-cols.md)
+level: basic ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-05-rows-cols.md)
 
 ## What you want to do
 
