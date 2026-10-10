@@ -1,3 +1,7 @@
 # Treat web page templates in ja/ and en/ as documentation for GitHub Linguist
 ja/* linguist-documentation
 en/* linguist-documentation
+
+# Map WebAssembly example code to WebAssembly language for GitHub stats
+examples/wasm/*.wat linguist-language=WebAssembly
+examples/wasm/*.wasm.js linguist-language=WebAssembly
