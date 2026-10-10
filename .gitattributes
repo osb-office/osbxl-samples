@@ -1,7 +1,11 @@
-# Treat web page templates in ja/ and en/ as documentation for GitHub Linguist
-ja/* linguist-documentation
-en/* linguist-documentation
+# Explicitly force GitHub Linguist to detect and display these languages
+examples/python/*.py linguist-detectable=true
+examples/nodejs/*.js linguist-detectable=true
+examples/java/*.java linguist-detectable=true
+examples/php/*.php linguist-detectable=true
+examples/wasm/*.wat linguist-detectable=true
+examples/wasm/*.wasm.js linguist-language=WebAssembly linguist-detectable=true
 
-# Map WebAssembly example code to WebAssembly language for GitHub stats
-examples/wasm/*.wat linguist-language=WebAssembly
-examples/wasm/*.wasm.js linguist-language=WebAssembly
+# Mark web template pages as vendored/documentation so they do not overpower code stats
+ja/* linguist-vendored=true
+en/* linguist-vendored=true
