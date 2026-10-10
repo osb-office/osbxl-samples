@@ -101,3 +101,11 @@ book.close();
 - **Interactive Web Samples**: [https://osb-office.com/sample/](https://osb-office.com/sample/)
 - **Product Features**: [https://osb-office.com/pages/features.php](https://osb-office.com/pages/features.php)
 - **Free Demo Download**: [https://osb-office.com/pages/download.php](https://osb-office.com/pages/download.php)
+
+---
+
+## 📄 License
+
+- **Sample Code & AI Skills**: [MIT License](LICENSE) — Feel free to use, copy, and modify in your projects.
+- **OSBXL Engine (Libraries)**: Commercial / Proprietary by osb-office.inc. See [LICENSE](LICENSE) or [LICENSE.ja.md](LICENSE.ja.md) for software license agreement details.
+
