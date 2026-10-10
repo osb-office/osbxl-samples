@@ -6,8 +6,26 @@
 osbxl は、AI によるコード自動生成に対応した、C++ 製コアによる超高速マルチプラットフォーム・スプレッドシート計算＆Excel 生成エンジンです。
 
 [![公式サイト](https://img.shields.io/badge/公式サイト-osb--office.com-blue?style=flat-square)](https://osb-office.com/)
+[![ライブラリ比較](https://img.shields.io/badge/性能比較-vs%20POI%20%7C%20openpyxl%20%7C%20PhpSpreadsheet-red?style=flat-square)](https://osb-office.com/pages/comparison.php)
 [![AI対応](https://img.shields.io/badge/AI最適化-Cursor%20%7C%20Copilot%20%7C%20Gemini-orange?style=flat-square)](https://osb-office.com/pages/ai-skill.php)
 [![対応言語](https://img.shields.io/badge/対応言語-Python%20%7C%20Node.js%20%7C%20Java%20%7C%20PHP%20%7C%20Wasm-green?style=flat-square)](https://osb-office.com/pages/features.php)
+
+---
+
+## 📊 主要Excelライブラリとの違い・性能比較
+
+> **詳細な比較表・移行ガイドは [公式サイトのライブラリ比較ページ](https://osb-office.com/pages/comparison.php) をご覧ください。**
+
+従来の高級言語ライブラリ（Apache POI、openpyxl、PhpSpreadsheet 等）で大量データを扱う際の**「メモリ不足（Memory Exhausted）」「GC による速度低下」「計算エンジンの不在」**を、C++ ネイティブコアにより根本から解決します。
+
+| 項目 | **osbxl** | **Apache POI (Java)** | **openpyxl (Python)** | **PhpSpreadsheet (PHP)** | **SheetJS / ExcelJS (JS)** |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **コア実装** | **C++ ネイティブ** | Java | Python | PHP | JavaScript |
+| **大量データ処理** | **◎ 圧倒的に高速** | ◯ (SXSSFストリーム) | △ (行数増加で遅延) | ✕ (数万行で極めて遅い) | ◯ / △ |
+| **メモリ消費** | **◎ 最小限（最大90%削減）** | △ (ヒープ大量消費) | △ (オブジェクト過多) | ✕ (メモリ制限で500エラー) | △ (V8ヒープ制限) |
+| **Excel計算式評価** | **約500関数（XLOOKUP等）** | 300〜400関数 | ✕ (数式評価不可) | △ (一部のみ・重い) | 限定的 / 有償版 |
+| **AIコード生成** | **◎ 公式AI Skill同梱** | なし (ハルシネーション頻発)| なし | なし | なし |
+| **WebAssembly** | **◎ 公式対応 (Wasm 3.0)** | ✕ | △ (巨大ランタイム要) | ✕ | ◯ |
 
 ---
 
@@ -95,6 +113,7 @@ wb.close();
 ## 🔗 公式リンク・リソース
 
 - **公式サイト**: [https://osb-office.com/](https://osb-office.com/)
+- **主要Excelライブラリ比較（POI / openpyxl / PhpSpreadsheet）**: [https://osb-office.com/pages/comparison.php](https://osb-office.com/pages/comparison.php)
 - **公式 AI Skill ガイド & ダウンロード**: [https://osb-office.com/pages/ai-skill.php](https://osb-office.com/pages/ai-skill.php)
 - **Web サンプル集（動作確認済み）**: [https://osb-office.com/sample/](https://osb-office.com/sample/)
 - **製品特徴**: [https://osb-office.com/pages/features.php](https://osb-office.com/pages/features.php)
