@@ -25,32 +25,24 @@ Official verified code samples and patterns for **[osbxl (https://osb-office.com
 ```text
 osbxl-samples/
 ├── README.md               # Overview and quick reference
-├── ja/                     # 日本語版サンプル集 (HTML / Web形式)
-│   ├── index.php           # サンプル一覧・やりたいこと別インデックス
-│   ├── general-01-overview.php          # 概要・オブジェクトモデル・基本の流れ
-│   ├── general-02-values-formulas.php   # 値と数式・相対参照
-│   ├── general-03-sheets.php            # ワークシート操作（追加・削除・リネーム）
-│   ├── general-04-value-types.php       # セル値の型（文字列・数値・日付・時刻）
-│   ├── general-05-rows-cols.php         # 行・列・セル範囲（挿入・クリア・コピー）
-│   ├── general-06-bulk-input.php        # 大量データの一括高速投入
-│   ├── general-07-autofilter-sort.php   # オートフィルター・並べ替え
-│   ├── general-08-tables-comments.php   # テーブル（ListObjects）・集計行・コメント
-│   ├── general-09-conditional-format.php# 条件付き書式（カラースケール・データバー）
-│   ├── general-10-charts.php            # グラフ（縦棒・折れ線）作成
-│   └── general-11-pivottables.php       # ピボットテーブル集計
-└── en/                     # English Samples Collection
-    ├── index.php           # Sample index and task-based guide
-    ├── general-01-overview.php          # Overview, object model & basic lifecycle
-    ├── general-02-values-formulas.php   # Values, formulas & relative references
-    ├── general-03-sheets.php            # Worksheets operations
-    ├── general-04-value-types.php       # Cell value types & formatting
-    ├── general-05-rows-cols.php         # Rows, columns & ranges
-    ├── general-06-bulk-input.php        # High-speed bulk input
-    ├── general-07-autofilter-sort.php   # AutoFilter & sorting
-    ├── general-08-tables-comments.php   # Tables (ListObjects) & comments
-    ├── general-09-conditional-format.php# Conditional formatting
-    ├── general-10-charts.php            # Charts creation
-    └── general-11-pivottables.php       # PivotTables
+├── README.ja.md            # 日本語版 README
+├── LICENSE                 # Licenses (MIT for samples, OSBXL agreement for engine)
+├── LICENSE.ja.md           # 日本語版ライセンス条項
+├── examples/               # Standalone runnable code examples
+│   ├── python/             # Python samples
+│   │   ├── quickstart.py             # Basic workbook creation & formulas
+│   │   ├── chart_sample.py           # Column & line charts creation
+│   │   ├── table_comments_sample.py  # Tables (ListObjects) & threaded comments
+│   │   └── conditional_format_sample.py # Conditional formatting & data bars
+│   ├── nodejs/             # Node.js samples
+│   │   ├── quickstart.js             # Basic workbook creation & formulas
+│   │   ├── chart_sample.js           # Column & line charts creation
+│   │   └── table_comments_sample.js  # Tables (ListObjects) & threaded comments
+│   ├── java/               # Java sample (QuickStart.java)
+│   ├── php/                # PHP sample (quickstart.php)
+│   └── wasm/               # WebAssembly sample (quickstart.wat, quickstart.wasm.js)
+├── ja/                     # 日本語版 Web 形式リファレンス (general-01 ~ 11)
+└── en/                     # English Web Reference (general-01 ~ 11)
 ```
 
 ---

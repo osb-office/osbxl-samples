@@ -32,26 +32,23 @@ osbxl は、AI によるコード自動生成に対応した、C++ 製コアに�
 osbxl-samples/
 ├── README.md               # 英語版 README (English)
 ├── README.ja.md            # 日本語版 README (本ファイル)
+├── LICENSE                 # ライセンス条項 (英語版)
+├── LICENSE.ja.md           # ライセンス条項 (日本語版)
 ├── examples/               # 実行可能コードサンプル
-│   ├── python/             # Python サンプル (quickstart.py)
-│   ├── nodejs/             # Node.js サンプル (quickstart.js)
+│   ├── python/             # Python サンプル
+│   │   ├── quickstart.py             # 基本操作 & 数式
+│   │   ├── chart_sample.py           # 縦棒 & 折れ線グラフ作成
+│   │   ├── table_comments_sample.py  # テーブル (ListObjects) & コメント
+│   │   └── conditional_format_sample.py # 条件付き書式 & データバー
+│   ├── nodejs/             # Node.js サンプル
+│   │   ├── quickstart.js             # 基本操作 & 数式
+│   │   ├── chart_sample.js           # 縦棒 & 折れ線グラフ作成
+│   │   └── table_comments_sample.js  # テーブル (ListObjects) & コメント
 │   ├── java/               # Java サンプル (QuickStart.java)
 │   ├── php/                # PHP サンプル (quickstart.php)
 │   └── wasm/               # WebAssembly サンプル (quickstart.wat, quickstart.wasm.js)
-├── ja/                     # 日本語版 詳細ドキュメント・Webサンプル集
-│   ├── index.php           # サンプル一覧・やりたいこと別インデックス
-│   ├── general-01-overview.php          # 概要・オブジェクトモデル・基本の流れ
-│   ├── general-02-values-formulas.php   # 値と数式・相対参照
-│   ├── general-03-sheets.php            # ワークシート操作（追加・削除・リネーム）
-│   ├── general-04-value-types.php       # セル値の型（文字列・数値・日付・時刻）
-│   ├── general-05-rows-cols.php         # 行・列・セル範囲（挿入・クリア・コピー）
-│   ├── general-06-bulk-input.php        # 大量データの一括高速投入
-│   ├── general-07-autofilter-sort.php   # オートフィルター・並べ替え
-│   ├── general-08-tables-comments.php   # テーブル（ListObjects）・集計行・コメント
-│   ├── general-09-conditional-format.php# 条件付き書式（カラースケール・データバー）
-│   ├── general-10-charts.php            # グラフ（縦棒・折れ線）作成
-│   └── general-11-pivottables.php       # ピボットテーブル集計
-└── en/                     # 英語版 詳細ドキュメント・Webサンプル集
+├── ja/                     # 日本語版 Web 形式リファレンス (general-01 ~ 11)
+└── en/                     # 英語版 Web 形式リファレンス (general-01 ~ 11)
 ```
 
 ---
