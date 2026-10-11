@@ -100,8 +100,8 @@ Stress test results scaling data up to **50,000 rows × 4 columns = 200,000 cell
 
 | Runtime / Limits | Library | Execution Time | Memory Usage | Highlights & Fault Analysis |
 |---|---|:---:|:---:|---|
-| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**7.194 s**<br>*(setOnly: 2.348s)* | ✕ OOM (>128MB limit)<br>**32.00 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 32 MB** (generating a 1.93 MB .xlsx). |
-| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**8.400 s**<br>*(setOnlyMode)* | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**7.194 s** | ✕ OOM (>128MB limit)<br>**32.00 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 32 MB** (generating a 1.93 MB .xlsx). |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**15.740 s** | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
 | **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.165 s<br>**2.329 s** | 766.54 MB<br>**1,799 MB**<br>*(V8 heap: 20.9 MB)* | Under identical write-only conditions (setOnlyMode), nodeosbxl clocks in at 2.3s.<br>While ExcelJS inflates V8 heap (>420 MB), **nodeosbxl uses only 20.9 MB of V8 heap**. |
 | **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.470 s<br>**2.433 s** | 378.28 MB<br>**1,439 MB**<br>*(Python heap: 28 MB)* | Under identical write-only conditions (setOnlyMode), **pyosbxl matches openpyxl at 2.4s**.<br>Python runtime heap usage is only 28 MB. |
 

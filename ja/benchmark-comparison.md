@@ -55,8 +55,8 @@ osbxl が備えるコア機能を基準に、各オープンソース・著名�
 
 | 言語 / 環境 | ライブラリ | 処理時間 (秒) | メモリ消費 (MB) | 実測結果・限界検証 |
 |---|---|:---:|:---:|---|
-| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**7.194 秒**<br>*(setOnly: 2.348秒)* | ✕ 128MB上限超過 (OOM)<br>**32.00 MB** | **PhpSpreadsheet はメモリ上限超過で即死**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 32MB で安全完走**（ファイルサイズ 1.93MB）。 |
-| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**8.400 秒**<br>*(setOnlyMode)* | ✕ 256MBヒープ枯渇 (OOM)<br>**42.13 MB** | **POI はヒープ枯渇で即死**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 42MB の軽量ヒープで完走**（SXSSFのような機能制限書き換え不要）。 |
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**7.194 秒** | ✕ 128MB上限超過 (OOM)<br>**32.00 MB** | **PhpSpreadsheet はメモリ上限超過で即死**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 32MB で安全完走**（ファイルサイズ 1.93MB）。 |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**15.740 秒** | ✕ 256MBヒープ枯渇 (OOM)<br>**42.13 MB** | **POI はヒープ枯渇で即死**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 42MB の軽量ヒープで完走**（SXSSFのような機能制限書き換え不要）。 |
 | **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.165 秒<br>**2.329 秒** | 766.54 MB<br>**1,799 MB**<br>*(V8ヒープ: 20.9MB)* | 同等の書き出し条件（setOnlyMode）で2.3秒台を達成。<br>ExcelJSがV8ヒープを大量消費（420MB超）するのに対し、**nodeosbxlのV8ヒープ消費はわずか20.9MBで安全**。 |
 | **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.470 秒<br>**2.433 秒** | 378.28 MB<br>**1,439 MB**<br>*(Pythonヒープ: 28MB)* | 同等の書き出し条件（setOnlyMode）で**openpyxlを上回る2.4秒台（互角以上）を達成**。<br>Pythonヒープ消費はわずか28MB。 |
 
