@@ -21,27 +21,15 @@ def main():
     try:
         ws = wb.openWorkSheet("Sheet1")
 
-        # 1. Populate data rows using setValueArray for efficiency
+        # 1. Populate data rows using setRangeData for efficiency
         rows = [
             ["Product", "Unit Price", "Quantity"],
-            ["Apple", 120, 15],
-            ["Orange", 80, 25],
-            ["Banana", 100, 10],
-            ["Grape", 300, 8],
+            ["Apple", "120", "15"],
+            ["Orange", "80", "25"],
+            ["Banana", "100", "10"],
+            ["Grape", "300", "8"],
         ]
-
-        values = []
-        for ri, row in enumerate(rows, start=1):
-            for ci, cell in enumerate(row, start=1):
-                a1 = app.convertFromRowColNumber(ri, ci)
-                obj = dto.InputValueObject()
-                if isinstance(cell, (int, float)):
-                    obj.setNumberValue(a1, cell)
-                else:
-                    obj.setStringValue(a1, cell)
-                values.append(obj)
-
-        ws.setValueArray(values)
+        ws.setRangeData("A1", rows)
 
         # 2. Create Table (ListObject)
         # addList(tableName, range, hasHeaders, showTotalRow)

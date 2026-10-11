@@ -113,15 +113,10 @@ ws.getRange(`B${row}:B${row}`).setNumberValue(price);
 ws.getRange(`C${row}:C${row}`).setNumberValue(qty);
 });
 // --- 金額列 (D2:D4) ---
-// 行ごとに異なる相対参照を入れたいので setFormulaArray を使う。
+// 行ごとに異なる相対参照を入れたいので setRangeFormulas を使う。
 // 数式文字列に先頭の "=" は付けない。
-const formulas = data.map((\_, i) => {
-const f = new dto.InputFormulaObject();
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)); // D2, D3, D4
-f.setFormula(`B${i + 2}\*C${i + 2}`); // "B2\*C2" ...
-return f;
-});
-ws.setFormulaArray(formulas);
+const formulas = data.map((_, i) => [`B${i + 2}*C${i + 2}`]);
+ws.setRangeFormulas("D2", formulas);
 // --- 合計 (D5) ---
 ws.getRange("C5:C5").setValue("合計");
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)");
@@ -155,16 +150,11 @@ row = i + 2
 ws.getRange(f"A{row}:A{row}").setValue(name)
 ws.getRange(f"B{row}:B{row}").setNumberValue(price)
 ws.getRange(f"C{row}:C{row}").setNumberValue(qty)
-# --- 金額列 (D2:D4) ---
-# 行ごとに異なる相対参照を入れたいので setFormulaArray を使う。
+# # --- 金額列 (D2:D4) ---
+# 行ごとに異なる相対参照を入れたいので setRangeFormulas を使う。
 # 数式文字列に先頭の "=" は付けない。
-formulas = []
-for i in range(len(data)):
-f = pyosbxl.dto.InputFormulaObject()
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)) # D2, D3, D4
-f.setFormula(f"B{i + 2}\*C{i + 2}") # "B2\*C2" ...
-formulas.append(f)
-ws.setFormulaArray(formulas)
+formulas = [[f"B{i + 2}*C{i + 2}"] for i in range(len(data))]
+ws.setRangeFormulas("D2", formulas)
 # --- 合計 (D5) ---
 ws.getRange("C5:C5").setValue("合計")
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)")
@@ -182,9 +172,9 @@ wb.close()
 
 ```java
 // values-formulas.java — node 版サンプルと同一検証 (javaosbxl)
-import com.osboffice.osbxl.\*;
-import com.osboffice.osbxl.dto.\*;
+import com.osboffice.osbxl.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 public class Main {
@@ -210,16 +200,13 @@ ws.getRange("B" + row + ":B" + row).setNumberValue(prices[i]);
 ws.getRange("C" + row + ":C" + row).setNumberValue(qtys[i]);
 }
 // --- 金額列 (D2:D4) ---
-// 行ごとに異なる相対参照を入れたいので setFormulaArray を使う。
+// 行ごとに異なる相対参照を入れたいので setRangeFormulas を使う。
 // 数式文字列に先頭の "=" は付けない。
-List<InputFormulaObjectWrapper> formulas = new ArrayList<>();
+List<List<String>> formulas = new ArrayList<>();
 for (int i = 0; i < names.length; i++) {
-InputFormulaObjectWrapper f = new InputFormulaObjectWrapper();
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)); // D2, D3, D4
-f.setFormula("B" + (i + 2) + "\*C" + (i + 2)); // "B2\*C2" ...
-formulas.add(f);
+formulas.add(Collections.singletonList("B" + (i + 2) + "*C" + (i + 2)));
 }
-ws.setFormulaArray(formulas);
+ws.setRangeFormulas("D2", formulas);
 // --- 合計 (D5) ---
 ws.getRange("C5:C5").setValue("合計");
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)");
@@ -259,17 +246,14 @@ $ws->getRange("B{$row}:B{$row}")->setNumberValue($price);
 $ws->getRange("C{$row}:C{$row}")->setNumberValue($qty);
 }
 // --- 金額列 (D2:D4) ---
-// 行ごとに異なる相対参照を入れたいので setFormulaArray を使う。
+// 行ごとに異なる相対参照を入れたいので setRangeFormulas を使う。
 // 数式文字列に先頭の "=" は付けない。
 $formulas = [];
 for ($i = 0; $i < count($data); $i++) {
-$f = new \phposbxl\dto\InputFormulaObject();
 $row = $i + 2;
-$f->setA1C1($app->convertFromRowColNumber($i + 2, 4)); // D2, D3, D4
-$f->setFormula("B{$row}\*C{$row}"); // "B2\*C2" ...
-$formulas[] = $f;
+$formulas[] = ["B{$row}*C{$row}"];
 }
-$ws->setFormulaArray($formulas);
+$ws->setRangeFormulas("D2", $formulas);
 // --- 合計 (D5) ---
 $ws->getRange("C5:C5")->setValue("合計");
 $ws->getRange("D5:D5")->setFormula("SUM(D2:D4)");
@@ -308,15 +292,10 @@ ws.getRange(`B${row}:B${row}`).setNumberValue(price);
 ws.getRange(`C${row}:C${row}`).setNumberValue(qty);
 });
 // --- 金額列 (D2:D4) ---
-// 行ごとに異なる相対参照を入れたいので setFormulaArray を使う。
+// 行ごとに異なる相対参照を入れたいので setRangeFormulas を使う。
 // 数式文字列に先頭の "=" は付けない。
-const formulas = data.map((\_, i) => {
-const f = new dto.InputFormulaObject();
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)); // D2, D3, D4
-f.setFormula(`B${i + 2}\*C${i + 2}`); // "B2\*C2" ...
-return f;
-});
-ws.setFormulaArray(formulas);
+const formulas = data.map((_, i) => [`B${i + 2}*C${i + 2}`]);
+ws.setRangeFormulas("D2", formulas);
 // --- 合計 (D5) ---
 ws.getRange("C5:C5").setValue("合計");
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)");
@@ -353,7 +332,7 @@ wb.close();
 * **複数セル Range への `setValue` / `setNumberValue` は「全セルに同じ値」を入れます。** `ws.getRange("A1:C1").setValue("X")` → A1, B1, C1 すべて `"X"` になります。
 * **`setFormula()` は相対参照を自動展開しません。** `ws.getRange("B1:B3").setFormula("A1*2")` は **B1 だけ**に数式が入り、B2 / B3 は空のままです。  
    第3引数 `setAllCell` を true にした `setFormula("A1*2", false, true)` も 「同じ文字列をそのまま全セルにコピーする」だけで、`A2*2`, `A3*2` には**なりません** （結果 B1:B3 がすべて同じ値になります）。  
-   行ごとにずらした数式を入れたい場合は、このサンプルのように **`setFormulaArray()` + `dto.InputFormulaObject`（セルごとに A1C1 と数式を指定）** を使ってください。
+   行ごとにずらした数式を入れたい場合は、このサンプルのように **`setRangeFormulas()`（2次元配列で高速一括流し込み）** を使ってください。
 * **起動時にライセンス表示が stdout に 1 行出力されます**（プロセスにつき 1 回）。  
    標準出力をパースする処理を書く場合は注意してください。
 

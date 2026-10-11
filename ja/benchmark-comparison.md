@@ -41,8 +41,8 @@ osbxl が備えるコア機能を基準に、各オープンソース・著名�
 | 言語 / 環境 | ライブラリ | 処理時間 (秒) | メモリ消費 (MB) | 特徴・評価 |
 |---|---|:---:|:---:|---|
 | **Java** (JDK 1.8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.622 秒<br>**0.139 秒** | 15.19 MB<br>**16.87 MB** | **osbxl が約 4.5 倍高速**。<br>POIはスキーマクラス群の初期化が重く、200行規模では osbxl の起動の軽さが圧倒的。 |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 0.059 秒<br>**0.054 秒** | 113.48 MB<br>**132.02 MB** | **nodeosbxl が僅差で高速**（0.05秒台）。<br>V8ヒープ内ですぐに完了。nodeosbxlは計算エンジン内蔵ながら同等以上の速度。 |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | **0.019 秒**<br>0.052 秒 | 53.57 MB<br>77.81 MB | openpyxlが最速だが**数式計算不可（セル値がNone）**。<br>pyosbxlは0.05秒で四則演算・SUMのネイティブ計算結果まで完了。 |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.059 秒<br>**0.035 秒** | 109.07 MB<br>**125.61 MB** | **nodeosbxl がExcelJSを上回る0.03秒台（約1.7倍高速）**。<br>同等の書き出し条件でExcelJSを圧倒し、V8ヒープ消費もわずか18MB。 |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | **0.018 秒**<br>0.032 秒 | 53.73 MB<br>70.84 MB | openpyxlと同等の書き出し専用モードで**0.03秒台の超高速生成**。<br>Pythonヒープ消費はわずか12MB。 |
 | **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.117 秒<br>**0.122 秒** | 26.00 MB<br>**2.00 MB** | 処理時間は0.1秒台で互角だが、**メモリは phposbxl が 13 倍省メモリ（2MB）**。<br>Webサーバーでの並行ダウンロード時に致命的な差となる。 |
 
 ---
@@ -55,16 +55,16 @@ osbxl が備えるコア機能を基準に、各オープンソース・著名�
 
 | 言語 / 環境 | ライブラリ | 処理時間 (秒) | メモリ消費 (MB) | 実測結果・限界検証 |
 |---|---|:---:|:---:|---|
-| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**8.329 秒** | ✕ 128MB上限超過 (OOM)<br>**22.01 MB** | **PhpSpreadsheet はメモリ上限超過で即死**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 22MB で安全完走**（ファイルサイズ 1.93MB）。 |
-| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**15.740 秒** | ✕ 256MBヒープ枯渇 (OOM)<br>**42.13 MB** | **POI はヒープ枯渇で即死**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 42MB の軽量ヒープで完走**（SXSSFのような機能制限書き換え不要）。 |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 秒<br>**7.836 秒** | 864.66 MB<br>**1,060 MB**<br>(*Nodeヒープは31MB) | ExcelJSは数式を計算せず文字列データとして素通り保存する単なるシリアライザー（計算エンジン非搭載）。<br>nodeosbxlは**全数式のネイティブ計算（依存関係グラフ展開・評価）を実行**。 |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 秒<br>**8.049 秒** | 299.72 MB<br>**964 MB** | openpyxlは数式を一切計算しない（セル値は`None`のまま文字として流すのみ）。<br>pyosbxlは**全数式をヘッドレス計算し結果値を確定**。 |
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**7.194 秒**<br>*(setOnly: 2.348秒)* | ✕ 128MB上限超過 (OOM)<br>**32.00 MB** | **PhpSpreadsheet はメモリ上限超過で即死**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 32MB で安全完走**（ファイルサイズ 1.93MB）。 |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**8.400 秒**<br>*(setOnlyMode)* | ✕ 256MBヒープ枯渇 (OOM)<br>**42.13 MB** | **POI はヒープ枯渇で即死**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 42MB の軽量ヒープで完走**（SXSSFのような機能制限書き換え不要）。 |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.165 秒<br>**2.329 秒** | 766.54 MB<br>**1,799 MB**<br>*(V8ヒープ: 20.9MB)* | 同等の書き出し条件（setOnlyMode）で2.3秒台を達成。<br>ExcelJSがV8ヒープを大量消費（420MB超）するのに対し、**nodeosbxlのV8ヒープ消費はわずか20.9MBで安全**。 |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.470 秒<br>**2.433 秒** | 378.28 MB<br>**1,439 MB**<br>*(Pythonヒープ: 28MB)* | 同等の書き出し条件（setOnlyMode）で**openpyxlを上回る2.4秒台（互角以上）を達成**。<br>Pythonヒープ消費はわずか28MB。 |
 
-> 💡 **処理速度とメモリの差に関する技術的背景（計算エンジンの有無）**:  
-> - **オープンソース側（ExcelJS / openpyxl）の仕組み**:  
->   これらは**「数式計算エンジンを持たない純粋なシリアライザー（データ書き出し専用）」**です。数式（`SUM`等）が指定されても計算処理は一切行わず、単なる「文字列データ」としてXMLに素通りして出力します。そのため一見処理速度が速く見えますが、Excel本体で開くまでは計算結果が存在せず（値が`None`や空文字）、バックエンド側で計算値を利用・検証することは一切できません。
-> - **osbxl（nodeosbxl / pyosbxl）の仕組み**:  
->   Excel非起動下（ヘッドレス環境）でも約500関数の数式を即時評価できるよう、20万セル規模の**「セル依存関係グラフ」をネイティブメモリ上に構築し、全セルの数式評価と結果値確定を実行**しています。速度差（約1〜2秒 vs 約7〜8秒）およびメモリ差は、この「実際にフル数式計算を実行しているかどうか」という根本的なアーキテクチャの役割の違いによるものです。なお、言語ランタイム側のヒープ消費はNode.jsでわずか31.5MBに抑えられています。
+> 💡 **メモリ使用構造と言語ヒープの安全性について**:  
+> - **オープンソース側（ExcelJS / openpyxl）の挙動**:  
+>   全セルを行列オブジェクトとして言語側ヒープに抱え込むため、Node.js や Python のヒープ上限を急速に圧迫します（ExcelJSは420MB超、openpyxlは370MB超）。
+> - **osbxl（nodeosbxl / pyosbxl）の挙動**:  
+>   2次元配列データを即座に C++ エンジンへ引き渡すため、**Node.js 側の V8 ヒープ消費は 50,000 行でもわずか 20.9 MB、Python 側も 28 MB** に抑えられ、言語ランタイムの OOM（ヒープ枯渇）クラッシュを起こしません。プロセス全体の Peak RSS は、20万セルの XML 並列生成と ZIP ストリーム圧縮バッファを C++ コアで高速処理するために一時的に確保されるネイティブ作業領域です。
 
 ### 既存オープンソースライブラリの限界詳細
 

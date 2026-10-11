@@ -34,11 +34,11 @@
 | # | タイトル | level | 主な API |
 | --- | --- | --- | --- |
 | 01 | [概要 — オブジェクトモデルと基本の流れ](general-01-overview.md) | basic | App / WorkBook / WorkSheet / Range |
-| 02 | [値と数式を入れて表を作る](general-02-values-formulas.md) | basic | Range / InputFormulaObject |
+| 02 | [値と数式を入れて表を作る](general-02-values-formulas.md) | basic | Range / setRangeFormulas |
 | 03 | [ブックとワークシートの操作 — 追加・削除・移動・リネーム](general-03-sheets.md) | basic | WorkBook / WorkSheet |
 | 04 | [セル値の型と表示書式 — 文字列・数値・日付・時刻・真偽値](general-04-value-types.md) | basic | Range / DateTimeObject |
 | 05 | [行・列・セル範囲の操作 — 挿入・削除・クリア・コピー](general-05-rows-cols.md) | basic | WorkSheet / Row / Col |
-| 06 | [大量データの一括投入 — setValueArray / setFormulaArray](general-06-bulk-input.md) | intermediate | WorkSheet / InputValueObject / InputFormulaObject |
+| 06 | [大量データの一括高速投入 — setRangeData / setRangeFormulas](general-06-bulk-input.md) | intermediate | WorkSheet (setRangeData / setRangeFormulas) |
 | 07 | [オートフィルターと並べ替え — 条件フィルター・ソート](general-07-autofilter-sort.md) | intermediate | AutoFilter / Sort |
 | 08 | [テーブルとコメント — ListObjects・集計行・構造化参照](general-08-tables-comments.md) | intermediate | ListObjects / Table / Comments |
 | 09 | [条件付き書式 — セル値ルール・カラースケール・データバー](general-09-conditional-format.md) | intermediate | FormatConditions / ColorScaleObject / DataBarObject |

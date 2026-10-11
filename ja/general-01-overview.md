@@ -90,7 +90,7 @@ const app = new osbxl.App(); // ここから先は Node.js 版と同じ（namesp
 | namespace | 中身 | 数 |
 | --- | --- | --- |
 | `nodeosbxl` | 操作の対象になるクラス（App / WorkBook / WorkSheet / Range / Font / Chart 系の入口 など） | 29 クラス |
-| `dto` | データの受け渡しに使うオブジェクト（`InputValueObject`, `FontObject`, `ColorObject` など） | 40 クラス |
+| `dto` | データの受け渡しに使うオブジェクト（`BordersObject`, `FontObject`, `ColorObject` など） | 40 クラス |
 | `chart` | グラフ専用オブジェクト（`ChartObject`, `Axis`, `ChartTitle` など） | 43 クラス |
 | `enums` | Excel 互換の列挙型（`XlFont`, `XlChartType`, `XlIndexColor` など） | 127 種 |
 
@@ -360,8 +360,8 @@ xlsx ファイル 1 つに対応します。
 | `deleteRow(startRow, numOfRows)` | 行の削除を行います。 |
 | `insertCol(startCol, numOfCols)` | 列の挿入を行います。 |
 | `deleteCol(startCol, numOfCols)` | 列の削除を行います。 |
-| `setValueArray(values)` | セル値の一括入力を行います。 |
-| `setFormulaArray(formulas)` | 関数の一括入力を行います。 |
+| `setRangeData(startAddress, data)` | 2次元配列によるセル値の超高速一括流し込みを行います（数値自動認識）。 |
+| `setRangeFormulas(startAddress, formulas)` | 2次元配列による数式の超高速一括流し込みを行います。 |
 
 その他（30）: 機能オブジェクト取得 `getFormatConditions` `getAutoFilter` `getSort` `getComments` `getHyperLinks` `getListObjects` `getPivotTables` `getShapes` `getWindow` `getHPageBreaks` `getVPageBreaks` / グラフ `getChartObject` `addChartObject` `deleteChartObject` / 印刷設定 `getPageSetupObject` `setPageSetupObject` / 選択 `getActiveCell` `setActiveCell` / 行・列・セルの操作 `clearRow` `copyRow` `clearCol` `copyCol` `insertCell` `deleteCell` `clearCell` `copyCell` / アウトライン `setRowOutline` `clearRowOutline` `setColOutline` `clearColOutline`
 

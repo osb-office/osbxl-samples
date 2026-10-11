@@ -34,11 +34,11 @@ These osbxl samples have all been executed and verified. The code on each page r
 | # | Title | level | Main APIs |
 | --- | --- | --- | --- |
 | 01 | [Overview — object model and basic flow](general-01-overview.md) | basic | App / WorkBook / WorkSheet / Range |
-| 02 | [Building a Table with Values and Formulas](general-02-values-formulas.md) | basic | Range / InputFormulaObject |
+| 02 | [Building a Table with Values and Formulas](general-02-values-formulas.md) | basic | Range / setRangeFormulas |
 | 03 | [Working with books and sheets — add, delete, move, rename](general-03-sheets.md) | basic | WorkBook / WorkSheet |
 | 04 | [Cell value types and number formats — strings, numbers, dates, times, booleans](general-04-value-types.md) | basic | Range / DateTimeObject |
 | 05 | [Rows, columns and cell ranges — insert, delete, clear, copy](general-05-rows-cols.md) | basic | WorkSheet / Row / Col |
-| 06 | [Bulk input of large data — setValueArray / setFormulaArray](general-06-bulk-input.md) | intermediate | WorkSheet / InputValueObject / InputFormulaObject |
+| 06 | [High-speed bulk input of large data — setRangeData / setRangeFormulas](general-06-bulk-input.md) | intermediate | WorkSheet (setRangeData / setRangeFormulas) |
 | 07 | [AutoFilter and sorting — conditional filters, sort](general-07-autofilter-sort.md) | intermediate | AutoFilter / Sort |
 | 08 | [Tables and comments — ListObjects, totals row, structured references](general-08-tables-comments.md) | intermediate | ListObjects / Table / Comments |
 | 09 | [Conditional formatting — cell value rules, color scales, data bars](general-09-conditional-format.md) | intermediate | FormatConditions / ColorScaleObject / DataBarObject |

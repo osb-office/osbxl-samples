@@ -21,29 +21,15 @@ function main() {
   try {
     const ws = wb.openWorkSheet("Sheet1");
 
-    // 1. Bulk populate using setValueArray
+    // 1. Bulk populate using setRangeData
     const rows = [
       ["Product", "Unit Price", "Quantity"],
-      ["Apple", 120, 15],
-      ["Orange", 80, 25],
-      ["Banana", 100, 10],
-      ["Grape", 300, 8],
+      ["Apple", "120", "15"],
+      ["Orange", "80", "25"],
+      ["Banana", "100", "10"],
+      ["Grape", "300", "8"],
     ];
-
-    const values = [];
-    rows.forEach((row, ri) => {
-      row.forEach((cell, ci) => {
-        const a1 = app.convertFromRowColNumber(ri + 1, ci + 1);
-        const obj = new dto.InputValueObject();
-        if (typeof cell === "number") {
-          obj.setNumberValue(a1, cell);
-        } else {
-          obj.setStringValue(a1, cell);
-        }
-        values.push(obj);
-      });
-    });
-    ws.setValueArray(values);
+    ws.setRangeData("A1", rows);
 
     // 2. Create Table (ListObject)
     const table = ws.getListObjects().addList("ProductSales", "A1:C5", true, true);

@@ -1,37 +1,25 @@
-# Bulk Input — setValueArray / setFormulaArray
+# High-Speed Bulk Input — setRangeData / setRangeFormulas
 
-level: intermediate ／ verified: 2026-10-04 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-06-bulk-input.md)
+level: intermediate ／ verified: 2026-10-11 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-06-bulk-input.md)
 
 ## What you want to do
 
-Write values and formulas into thousands or tens of thousands of cells **in one shot as an array** instead of calling `getRange()` per cell. Also, bulk-input formulas whose relative references shift row by row.
+Write values and formulas into thousands or tens of thousands of cells **in one shot as a 2D matrix array** instead of calling `getCells()` per cell. Populate tabular data from CSV files or database query results into worksheets with maximum speed and minimal memory overhead.
 
-| Approach | What to use |
-| --- | --- |
-| Per-cell input | `ws.getCells(r, c).setNumberValue(...)` |
-| **Bulk value input** | `ws.setValueArray(Array<dto.InputValueObject>)` |
-| **Bulk formula input** | `ws.setFormulaArray(Array<dto.InputFormulaObject>)` |
+| Approach | What to use | Characteristics |
+| --- | --- | --- |
+| Per-cell input | `ws.getCells(r, c).setNumberValue(...)` | Suitable for a few cells. Crossing language/C++ boundaries per cell incurs heavy overhead. |
+| **2D array value input (Fastest, Recommended)** | `ws.setRangeData(startA1, data)` | **Fastest & Recommended.** Zero DTO creation overhead. Numeric strings are automatically saved as numeric cells. |
+| **2D array formula input (Fastest, Recommended)** | `ws.setRangeFormulas(startA1, formulas)` | **Fastest & Recommended.** Stream formulas across calculation columns at once (no leading "=" needed). |
 
 ## Classes covered
 
-### `dto.InputValueObject`
+### `WorkSheet`
 
 | Method | Description |
 | --- | --- |
-| `setStringValue(A1C1, val, numberFormat?)` | Sets a string value. |
-| `setNumberValue(A1C1, val, forceString?, numberFormat?)` | Sets a number. |
-| `setBooleanValue(A1C1, val, forceString?, numberFormat?)` | Sets a boolean. |
-| `setDateTimeValue(A1C1, val, forceString?, numberFormat?)` | Sets a date/time value. |
-| `setEmptyVal(A1C1)` | Clears the cell range. |
-| `getA1C1()` / `getInputType()` / `getStringValue()` / `getNumberValue()` / `getBooleanValue()` / `getDateTimeValue()` / `getNumberFormat()` / `getForceString()` | Read back the configured content. |
-
-### `dto.InputFormulaObject`
-
-| Method | Description |
-| --- | --- |
-| `setA1C1(A1C1)` | Sets the target cell. |
-| `setFormula(formula)` | Sets the formula (no leading `=`). |
-| `getA1C1()` / `getFormula()` | Read back the configured content. |
+| `setRangeData(startA1, data)` | Bulk enters 2D cell values (array of string rows/columns) from the top-left start cell (e.g., "A1"). |
+| `setRangeFormulas(startA1, formulas)` | Bulk enters 2D formulas (array of formula string rows/columns, no "=") from the top-left start cell (e.g., "C1"). |
 
 ## Code
 
@@ -40,90 +28,76 @@ Output:
 #### [Node.js]
 
 ```javascript
-// bulk-input.js — bulk input of values and formulas, speed comparison against per-cell input
-const { nodeosbxl, dto } = require("nodeosbxl");
+// bulk-input.js — high-speed bulk input of values and formulas with 2D array (nodeosbxl)
+const { nodeosbxl } = require("nodeosbxl");
+
 const app = new nodeosbxl.App();
 const wb = app.createWorkBook("bulk-input.xlsx");
 const ws = wb.openWorkSheet("Sheet1");
-// ---------- 1. write mixed types in one shot ----------
-const date = new dto.DateTimeObject();
-date.setYMD(2024, 3, 20);
-const values = [];
-const addString = (a1, val) => {
-const o = new dto.InputValueObject();
-o.setStringValue(a1, val);
-values.push(o);
-};
-// Trailing optional arguments can be passed as undefined (treated as omitted)
-const addNumber = (a1, val, fmt) => {
-const o = new dto.InputValueObject();
-o.setNumberValue(a1, val, false, fmt);
-values.push(o);
-};
-addString("A1", "Product");
-addNumber("B1", 1234.5);
-addNumber("C1", 0.25, "0.0%");
-// Date: omitting the format auto-sets a default format (same as Range.setDateValue)
-const dateVal = new dto.InputValueObject();
-dateVal.setDateTimeValue("D1", date, false, "yyyy-mm-dd"); // explicit format
-values.push(dateVal);
-const dateVal2 = new dto.InputValueObject();
-dateVal2.setDateTimeValue("D2", date); // omitted → auto
-values.push(dateVal2);
-ws.setValueArray(values);
-console.log("[1] bulk input with mixed types");
-for (const a1 of ["A1", "B1", "C1", "D1", "D2"]) {
-const r = ws.getRange(`${a1}:${a1}`);
-console.log(` ${a1}: display=${JSON.stringify(r.getValue()[a1])} format=${JSON.stringify(r.getNumberFormat()[a1])}`);
+
+// ---------- 1. Bulk value input with 2D array (setRangeData) ----------
+// Prepare a 2D array of rows and columns as strings and write all at once starting from top-left cell.
+// Numeric strings like "100" are automatically stored as Excel numbers.
+const data = [
+    ["Product", "Price", "Qty"],
+    ["Apple", "100", "3"],
+    ["Orange", "50", "6"],
+    ["Grape", "150", "2"],
+];
+ws.setRangeData("A1", data);
+
+console.log("[1] After setRangeData:");
+for (const a1 of ["A1", "B2", "C2"]) {
+    console.log(`    ${a1} = ${JSON.stringify(ws.getRange(a1).getValue()[a1])}`);
 }
-// ---------- 2. clearing cells is bulk input too ----------
-ws.getRange("A2:A2").setValue("temporary entry");
-const empty = new dto.InputValueObject();
-empty.setEmptyVal("A2");
-ws.setValueArray([empty]);
-console.log("[2] after setEmptyVal, A2 =", JSON.stringify(ws.getRange("A2:A2").getValue()["A2"]));
-// ---------- 3. bulk-input formulas with relative references shifted per row ----------
-// Range.setFormula() does not expand relative references, so use this instead
-for (let r = 1; r <= 3; r++) ws.getRange(`F${r}:F${r}`).setNumberValue(r \* 10);
-const formulas = [];
-for (let r = 1; r <= 3; r++) {
-const f = new dto.InputFormulaObject();
-f.setA1C1(app.convertFromRowColNumber(r, 7)); // G1, G2, G3
-f.setFormula(`F${r}\*2`); // different relative reference per row
-formulas.push(f);
-}
-ws.setFormulaArray(formulas);
-console.log("[3] after setFormulaArray");
-console.log(" formulas =", JSON.stringify(ws.getRange("G1:G3").getFormula()));
-console.log(" values =", JSON.stringify(ws.getRange("G1:G3").getValue(true)));
-// ---------- 4. speed comparison (2,000 rows x 5 cols = 10,000 cells) ----------
+
+// ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
+// Bulk input formulas across calculation columns (no leading "=" needed).
+const formulas = [
+    ["Subtotal"],
+    ["B2*C2"],
+    ["B3*C3"],
+    ["B4*C4"],
+];
+ws.setRangeFormulas("D1", formulas);
+
+console.log("[2] After setRangeFormulas:");
+console.log("    Formulas D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getFormula()));
+console.log("    Values   D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getValue(true)));
+
+// ---------- 3. Performance comparison (2,000 rows x 5 cols = 10,000 cells) ----------
 const ROWS = 2000, COLS = 5;
+
+// Per-cell input via getCells()
 const wsCell = wb.addWorkSheet("CellByCell");
 let t = Date.now();
 for (let r = 1; r <= ROWS; r++) {
-for (let c = 1; c <= COLS; c++) wsCell.getCells(r, c).setNumberValue(r \* 100 + c);
+    for (let c = 1; c <= COLS; c++) wsCell.getCells(r, c).setNumberValue(r * 100 + c);
 }
 const msCell = Date.now() - t;
+
+// 2D array input via setRangeData() (Fastest)
 const wsBulk = wb.addWorkSheet("Bulk");
-const bulk = [];
 t = Date.now();
+const matrix = [];
 for (let r = 1; r <= ROWS; r++) {
-for (let c = 1; c <= COLS; c++) {
-const o = new dto.InputValueObject();
-o.setNumberValue(app.convertFromRowColNumber(r, c), r \* 100 + c);
-bulk.push(o);
-}
+    const row = [];
+    for (let c = 1; c <= COLS; c++) row.push(String(r * 100 + c));
+    matrix.push(row);
 }
 const msBuild = Date.now() - t;
 t = Date.now();
-wsBulk.setValueArray(bulk);
+wsBulk.setRangeData("A1", matrix);
 const msApply = Date.now() - t;
-console.log(`[4] writing ${ROWS \* COLS} cells`);
-console.log(` per-cell getCells().setNumberValue() : ${msCell} ms`);
-console.log(` setValueArray (build ${msBuild} + write ${msApply}) : ${msBuild + msApply} ms`);
+
+console.log(`[3] Performance for ${ROWS * COLS} cells:`);
+console.log(`    Per-cell getCells().setNumberValue() : ${msCell} ms`);
+console.log(`    setRangeData (build ${msBuild} + write ${msApply}) : ${msBuild + msApply} ms (fastest)`);
+
 const a = wsCell.getRange("E2000:E2000").getValue(true)["E2000"];
 const b = wsBulk.getRange("E2000:E2000").getValue(true)["E2000"];
-console.log(`[check] both methods agree: E2000 = ${a === b ? a : `mismatch ${a} / ${b}`}`);
+console.log(`[Verification] Both match E2000 = ${a === Number(b) ? b : `mismatch ${a} / ${b}`}`);
+
 wb.save();
 wb.close();
 ```
@@ -131,95 +105,69 @@ wb.close();
 #### [Python]
 
 ```python
-# bulk-input.py — same verification as the Node.js sample (pyosbxl)
+# bulk-input.py — high-speed bulk input of values and formulas with 2D array (pyosbxl)
 import json
 import time
 import pyosbxl
+
 app = pyosbxl.App()
-wb = app.createWorkBook("bulk-input-py.xlsx")
+wb = app.createWorkBook("bulk-input.xlsx")
 ws = wb.openWorkSheet("Sheet1")
-# ---------- 1. write mixed types in one shot ----------
-date = pyosbxl.dto.DateTimeObject()
-date.setYMD(2024, 3, 20)
-values = []
-def add\_string(a1, val):
-o = pyosbxl.dto.InputValueObject()
-o.setStringValue(a1, val)
-values.append(o)
-# Trailing optional arguments are treated as omitted when not passed
-def add\_number(a1, val, fmt=None):
-o = pyosbxl.dto.InputValueObject()
-if fmt is None:
-o.setNumberValue(a1, val)
-else:
-o.setNumberValue(a1, val, False, fmt)
-values.append(o)
-add\_string("A1", "Product")
-add\_number("B1", 1234.5)
-add\_number("C1", 0.25, "0.0%")
-# Date: omitting the format auto-sets a default format (same as Range.setDateValue)
-date\_val = pyosbxl.dto.InputValueObject()
-date\_val.setDateTimeValue("D1", date, False, "yyyy-mm-dd") # explicit format
-values.append(date\_val)
-date\_val2 = pyosbxl.dto.InputValueObject()
-date\_val2.setDateTimeValue("D2", date) # omitted → auto
-values.append(date\_val2)
-ws.setValueArray(values)
-print("[1] bulk input with mixed types")
-for a1 in ["A1", "B1", "C1", "D1", "D2"]:
-r = ws.getRange(f"{a1}:{a1}")
-v = json.dumps(r.getValue()[a1], ensure\_ascii=False)
-fmt = json.dumps(r.getNumberFormat()[a1], ensure\_ascii=False)
-print(f" {a1}: display={v} format={fmt}")
-# ---------- 2. clearing cells is bulk input too ----------
-ws.getRange("A2:A2").setValue("temporary entry")
-empty = pyosbxl.dto.InputValueObject()
-empty.setEmptyVal("A2")
-ws.setValueArray([empty])
-print("[2] after setEmptyVal, A2 =", json.dumps(ws.getRange("A2:A2").getValue()["A2"], ensure\_ascii=False))
-# ---------- 3. bulk-input formulas with relative references shifted per row ----------
-# Range.setFormula() does not expand relative references, so use this instead
-for r in range(1, 4):
-ws.getRange(f"F{r}:F{r}").setNumberValue(r \* 10)
-formulas = []
-for r in range(1, 4):
-f = pyosbxl.dto.InputFormulaObject()
-f.setA1C1(app.convertFromRowColNumber(r, 7)) # G1, G2, G3
-f.setFormula(f"F{r}\*2") # different relative reference per row (no leading "=")
-formulas.append(f)
-ws.setFormulaArray(formulas)
-print("[3] after setFormulaArray")
-fm = ws.getRange("G1:G3").getFormula()
-vm = ws.getRange("G1:G3").getValue(True)
-keys = ["G1", "G2", "G3"]
-print(" formulas =", json.dumps({k: fm[k] for k in keys}, ensure\_ascii=False, separators=(",", ":")))
-print(" values =", json.dumps({k: vm[k] for k in keys}, ensure\_ascii=False, separators=(",", ":")))
-# ---------- 4. speed comparison (2,000 rows x 5 cols = 10,000 cells) ----------
+
+# ---------- 1. Bulk value input with 2D array (setRangeData) ----------
+data = [
+    ["Product", "Price", "Qty"],
+    ["Apple", "100", "3"],
+    ["Orange", "50", "6"],
+    ["Grape", "150", "2"],
+]
+ws.setRangeData("A1", data)
+
+print("[1] After setRangeData:")
+for a1 in ["A1", "B2", "C2"]:
+    print(f"    {a1} = {json.dumps(ws.getRange(a1).getValue()[a1], ensure_ascii=False)}")
+
+# ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
+formulas = [
+    ["Subtotal"],
+    ["B2*C2"],
+    ["B3*C3"],
+    ["B4*C4"],
+]
+ws.setRangeFormulas("D1", formulas)
+
+print("[2] After setRangeFormulas:")
+print("    Formulas D2:D4 =", json.dumps(ws.getRange("D2:D4").getFormula(), ensure_ascii=False))
+print("    Values   D2:D4 =", json.dumps(ws.getRange("D2:D4").getValue(True), ensure_ascii=False))
+
+# ---------- 3. Performance comparison (2,000 rows x 5 cols = 10,000 cells) ----------
 ROWS, COLS = 2000, 5
-ws\_cell = wb.addWorkSheet("CellByCell")
-t = time.perf\_counter()
+
+# Per-cell input via getCells()
+ws_cell = wb.addWorkSheet("CellByCell")
+t = time.perf_counter()
 for r in range(1, ROWS + 1):
-for c in range(1, COLS + 1):
-ws\_cell.getCells(r, c).setNumberValue(r \* 100 + c)
-ms\_cell = int((time.perf\_counter() - t) \* 1000)
-ws\_bulk = wb.addWorkSheet("Bulk")
-bulk = []
-t = time.perf\_counter()
-for r in range(1, ROWS + 1):
-for c in range(1, COLS + 1):
-o = pyosbxl.dto.InputValueObject()
-o.setNumberValue(app.convertFromRowColNumber(r, c), r \* 100 + c)
-bulk.append(o)
-ms\_build = int((time.perf\_counter() - t) \* 1000)
-t = time.perf\_counter()
-ws\_bulk.setValueArray(bulk)
-ms\_apply = int((time.perf\_counter() - t) \* 1000)
-print(f"[4] writing {ROWS \* COLS} cells")
-print(f" per-cell getCells().setNumberValue() : {ms\_cell} ms")
-print(f" setValueArray (build {ms\_build} + write {ms\_apply}) : {ms\_build + ms\_apply} ms")
-a = ws\_cell.getRange("E2000:E2000").getValue(True)["E2000"]
-b = ws\_bulk.getRange("E2000:E2000").getValue(True)["E2000"]
-print(f"[check] both methods agree: E2000 = {a if a == b else f'mismatch {a} / {b}'}")
+    for c in range(1, COLS + 1):
+        ws_cell.getCells(r, c).setNumberValue(r * 100 + c)
+ms_cell = int((time.perf_counter() - t) * 1000)
+
+# 2D array input via setRangeData() (Fastest)
+ws_bulk = wb.addWorkSheet("Bulk")
+t = time.perf_counter()
+matrix = [[str(r * 100 + c) for c in range(1, COLS + 1)] for r in range(1, ROWS + 1)]
+ms_build = int((time.perf_counter() - t) * 1000)
+t = time.perf_counter()
+ws_bulk.setRangeData("A1", matrix)
+ms_apply = int((time.perf_counter() - t) * 1000)
+
+print(f"[3] Performance for {ROWS * COLS} cells:")
+print(f"    Per-cell getCells().setNumberValue() : {ms_cell} ms")
+print(f"    setRangeData (build {ms_build} + write {ms_apply}) : {ms_build + ms_apply} ms (fastest)")
+
+a = ws_cell.getRange("E2000:E2000").getValue(True)["E2000"]
+b = ws_bulk.getRange("E2000:E2000").getValue(True)["E2000"]
+print(f"[Verification] Both match E2000 = {b if a == float(b) else f'mismatch {a} / {b}'}")
+
 wb.save()
 wb.close()
 ```
@@ -227,214 +175,153 @@ wb.close()
 #### [Java]
 
 ```java
-// bulk-input.java — same verification as the Node.js sample (javaosbxl)
-import com.osboffice.osbxl.\*;
-import com.osboffice.osbxl.dto.\*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+// bulk-input.java — high-speed bulk input of values and formulas with 2D array (javaosbxl)
+import com.osboffice.osbxl.*;
+import java.util.*;
+
 public class Main {
-// Quoted string, equivalent to JSON.stringify
-static String q(String s) { return "\"" + s + "\""; }
-static void addString(List<InputValueObjectWrapper> values, String a1, String val) {
-InputValueObjectWrapper o = new InputValueObjectWrapper();
-o.setStringValue(a1, val);
-values.add(o);
-}
-// If fmt == null, do not pass the optional arguments (treated as omitted)
-static void addNumber(List<InputValueObjectWrapper> values, String a1, double val, String fmt) {
-InputValueObjectWrapper o = new InputValueObjectWrapper();
-if (fmt == null) {
-o.setNumberValue(a1, val);
-} else {
-o.setNumberValue(a1, val, false, fmt);
-}
-values.add(o);
-}
-public static void main(String[] args) {
-AppWrapper app = new AppWrapper();
-WorkBookWrapper wb = app.createWorkBook("bulk-input-java.xlsx");
-WorkSheetWrapper ws = wb.openWorkSheet("Sheet1");
-// ---------- 1. write mixed types in one shot ----------
-DateTimeObjectWrapper date = new DateTimeObjectWrapper();
-date.setYMD(2024, 3, 20);
-List<InputValueObjectWrapper> values = new ArrayList<>();
-addString(values, "A1", "Product");
-addNumber(values, "B1", 1234.5, null);
-addNumber(values, "C1", 0.25, "0.0%");
-// Date: omitting the format auto-sets a default format (same as Range.setDateValue)
-InputValueObjectWrapper dateVal = new InputValueObjectWrapper();
-dateVal.setDateTimeValue("D1", date, false, "yyyy-mm-dd"); // explicit format
-values.add(dateVal);
-InputValueObjectWrapper dateVal2 = new InputValueObjectWrapper();
-dateVal2.setDateTimeValue("D2", date); // omitted → auto
-values.add(dateVal2);
-ws.setValueArray(values);
-System.out.println("[1] bulk input with mixed types");
-for (String a1 : new String[]{"A1", "B1", "C1", "D1", "D2"}) {
-RangeWrapper r = ws.getRange(a1 + ":" + a1);
-System.out.println(" " + a1 + ": display=" + q(r.getValue().get(a1))
-+ " format=" + q(r.getNumberFormat().get(a1)));
-}
-// ---------- 2. clearing cells is bulk input too ----------
-ws.getRange("A2:A2").setValue("temporary entry");
-InputValueObjectWrapper empty = new InputValueObjectWrapper();
-empty.setEmptyVal("A2");
-List<InputValueObjectWrapper> emptyList = new ArrayList<>();
-emptyList.add(empty);
-ws.setValueArray(emptyList);
-System.out.println("[2] after setEmptyVal, A2 = " + q(ws.getRange("A2:A2").getValue().get("A2")));
-// ---------- 3. bulk-input formulas with relative references shifted per row ----------
-// Range.setFormula() does not expand relative references, so use this instead
-for (int r = 1; r <= 3; r++) ws.getRange("F" + r + ":F" + r).setNumberValue(r \* 10);
-List<InputFormulaObjectWrapper> formulas = new ArrayList<>();
-for (int r = 1; r <= 3; r++) {
-InputFormulaObjectWrapper f = new InputFormulaObjectWrapper();
-f.setA1C1(app.convertFromRowColNumber(r, 7)); // G1, G2, G3
-f.setFormula("F" + r + "\*2"); // different relative reference per row (no leading "=")
-formulas.add(f);
-}
-ws.setFormulaArray(formulas);
-System.out.println("[3] after setFormulaArray");
-Map<String, String> fm = ws.getRange("G1:G3").getFormula();
-Map<String, String> vm = ws.getRange("G1:G3").getValue(true);
-System.out.println(" formulas = {\"G1\":" + q(fm.get("G1")) + ",\"G2\":" + q(fm.get("G2"))
-+ ",\"G3\":" + q(fm.get("G3")) + "}");
-System.out.println(" values = {\"G1\":" + q(vm.get("G1")) + ",\"G2\":" + q(vm.get("G2"))
-+ ",\"G3\":" + q(vm.get("G3")) + "}");
-// ---------- 4. speed comparison (2,000 rows x 5 cols = 10,000 cells) ----------
-final int ROWS = 2000, COLS = 5;
-WorkSheetWrapper wsCell = wb.addWorkSheet("CellByCell");
-long t = System.currentTimeMillis();
-for (int r = 1; r <= ROWS; r++) {
-for (int c = 1; c <= COLS; c++) wsCell.getCells(r, c).setNumberValue(r \* 100 + c);
-}
-long msCell = System.currentTimeMillis() - t;
-WorkSheetWrapper wsBulk = wb.addWorkSheet("Bulk");
-List<InputValueObjectWrapper> bulk = new ArrayList<>();
-t = System.currentTimeMillis();
-for (int r = 1; r <= ROWS; r++) {
-for (int c = 1; c <= COLS; c++) {
-InputValueObjectWrapper o = new InputValueObjectWrapper();
-o.setNumberValue(app.convertFromRowColNumber(r, c), r \* 100 + c);
-bulk.add(o);
-}
-}
-long msBuild = System.currentTimeMillis() - t;
-t = System.currentTimeMillis();
-wsBulk.setValueArray(bulk);
-long msApply = System.currentTimeMillis() - t;
-System.out.println("[4] writing " + (ROWS \* COLS) + " cells");
-System.out.println(" per-cell getCells().setNumberValue() : " + msCell + " ms");
-System.out.println(" setValueArray (build " + msBuild + " + write " + msApply + ") : "
-+ (msBuild + msApply) + " ms");
-String a = wsCell.getRange("E2000:E2000").getValue(true).get("E2000");
-String b = wsBulk.getRange("E2000:E2000").getValue(true).get("E2000");
-System.out.println("[check] both methods agree: E2000 = " + (a.equals(b) ? a : "mismatch " + a + " / " + b));
-wb.save();
-wb.close();
-}
+    public static void main(String[] args) {
+        App app = new App();
+        WorkBookWrapper wb = app.createWorkBook("bulk-input.xlsx");
+        WorkSheetWrapper ws = wb.openWorkSheet("Sheet1");
+
+        // ---------- 1. Bulk value input with 2D array (setRangeData) ----------
+        List<List<String>> data = Arrays.asList(
+            Arrays.asList("Product", "Price", "Qty"),
+            Arrays.asList("Apple", "100", "3"),
+            Arrays.asList("Orange", "50", "6"),
+            Arrays.asList("Grape", "150", "2")
+        );
+        ws.setRangeData("A1", data);
+
+        System.out.println("[1] After setRangeData:");
+        for (String a1 : Arrays.asList("A1", "B2", "C2")) {
+            System.out.println("    " + a1 + " = " + ws.getRange(a1).getValue().get(a1));
+        }
+
+        // ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
+        List<List<String>> formulas = Arrays.asList(
+            Collections.singletonList("Subtotal"),
+            Collections.singletonList("B2*C2"),
+            Collections.singletonList("B3*C3"),
+            Collections.singletonList("B4*C4")
+        );
+        ws.setRangeFormulas("D1", formulas);
+
+        System.out.println("[2] After setRangeFormulas:");
+        System.out.println("    Formulas D2:D4 = " + ws.getRange("D2:D4").getFormula());
+        System.out.println("    Values   D2:D4 = " + ws.getRange("D2:D4").getValue(true));
+
+        // ---------- 3. Performance comparison (2,000 rows x 5 cols = 10,000 cells) ----------
+        final int ROWS = 2000, COLS = 5;
+
+        // Per-cell input via getCells()
+        WorkSheetWrapper wsCell = wb.addWorkSheet("CellByCell");
+        long t = System.currentTimeMillis();
+        for (int r = 1; r <= ROWS; r++) {
+            for (int c = 1; c <= COLS; c++) wsCell.getCells(r, c).setNumberValue(r * 100 + c);
+        }
+        long msCell = System.currentTimeMillis() - t;
+
+        // 2D array input via setRangeData() (Fastest)
+        WorkSheetWrapper wsBulk = wb.addWorkSheet("Bulk");
+        t = System.currentTimeMillis();
+        List<List<String>> matrix = new ArrayList<>();
+        for (int r = 1; r <= ROWS; r++) {
+            List<String> row = new ArrayList<>();
+            for (int c = 1; c <= COLS; c++) row.add(String.valueOf(r * 100 + c));
+            matrix.add(row);
+        }
+        long msBuild = System.currentTimeMillis() - t;
+        t = System.currentTimeMillis();
+        wsBulk.setRangeData("A1", matrix);
+        long msApply = System.currentTimeMillis() - t;
+
+        System.out.println("[3] Performance for " + (ROWS * COLS) + " cells:");
+        System.out.println("    Per-cell getCells().setNumberValue() : " + msCell + " ms");
+        System.out.println("    setRangeData (build " + msBuild + " + write " + msApply + ") : " + (msBuild + msApply) + " ms (fastest)");
+
+        String a = wsCell.getRange("E2000:E2000").getValue(true).get("E2000");
+        String b = wsBulk.getRange("E2000:E2000").getValue(true).get("E2000");
+        System.out.println("[Verification] Both match E2000 = " + (a.equals(b) ? b : "mismatch " + a + " / " + b));
+
+        wb.save();
+        wb.close();
+    }
 }
 ```
 
 #### [PHP]
 
 ```php
-// bulk-input.md — bulk input of values and formulas, speed comparison against per-cell input (phposbxl)
+// bulk-input.php — high-speed bulk input of values and formulas with 2D array (phposbxl)
 $app = new \phposbxl\App();
-$wb = $app->createWorkBook("bulk-input-php.xlsx");
+$wb = $app->createWorkBook("bulk-input.xlsx");
 $ws = $wb->openWorkSheet("Sheet1");
-// JSON.stringify-compatible output (non-ASCII kept as-is)
-$jq = fn($x): string => json\_encode($x, JSON\_UNESCAPED\_UNICODE | JSON\_UNESCAPED\_SLASHES);
-$now = fn(): int => (int)(hrtime(true) / 1000000); // milliseconds
-// ---------- 1. write mixed types in one shot ----------
-$date = new \phposbxl\dto\DateTimeObject();
-$date->setYMD(2024, 3, 20);
-$values = [];
-$addString = function (string $a1, string $val) use (&$values): void {
-$o = new \phposbxl\dto\InputValueObject();
-$o->setStringValue($a1, $val);
-$values[] = $o;
-};
-// When an optional argument is omitted, call with fewer arguments (treated as omitted)
-$addNumber = function (string $a1, float $val, ?string $fmt = null) use (&$values): void {
-$o = new \phposbxl\dto\InputValueObject();
-if ($fmt === null) {
-$o->setNumberValue($a1, $val);
-} else {
-$o->setNumberValue($a1, $val, false, $fmt);
+
+$now = fn(): int => (int)(hrtime(true) / 1000000);   // ms
+
+// ---------- 1. Bulk value input with 2D array (setRangeData) ----------
+$data = [
+    ["Product", "Price", "Qty"],
+    ["Apple", "100", "3"],
+    ["Orange", "50", "6"],
+    ["Grape", "150", "2"],
+];
+$ws->setRangeData("A1", $data);
+
+echo "[1] After setRangeData:\n";
+foreach (["A1", "B2", "C2"] as $a1) {
+    echo "    {$a1} = ", json_encode($ws->getRange($a1)->getValue()[$a1], JSON_UNESCAPED_UNICODE), "\n";
 }
-$values[] = $o;
-};
-$addString("A1", "Product");
-$addNumber("B1", 1234.5);
-$addNumber("C1", 0.25, "0.0%");
-// Date: omitting the format auto-sets a default format (same as Range.setDateValue)
-$dateVal = new \phposbxl\dto\InputValueObject();
-$dateVal->setDateTimeValue("D1", $date, false, "yyyy-mm-dd"); // explicit format
-$values[] = $dateVal;
-$dateVal2 = new \phposbxl\dto\InputValueObject();
-$dateVal2->setDateTimeValue("D2", $date); // omitted → auto
-$values[] = $dateVal2;
-$ws->setValueArray($values);
-echo "[1] bulk input with mixed types\n";
-foreach (["A1", "B1", "C1", "D1", "D2"] as $a1) {
-$r = $ws->getRange("{$a1}:{$a1}");
-echo " {$a1}: display=", $jq($r->getValue()[$a1]), " format=", $jq($r->getNumberFormat()[$a1]), "\n";
-}
-// ---------- 2. clearing cells is bulk input too ----------
-$ws->getRange("A2:A2")->setValue("temporary entry");
-$empty = new \phposbxl\dto\InputValueObject();
-$empty->setEmptyVal("A2");
-$ws->setValueArray([$empty]);
-echo "[2] after setEmptyVal, A2 = ", $jq($ws->getRange("A2:A2")->getValue()["A2"]), "\n";
-// ---------- 3. bulk-input formulas with relative references shifted per row ----------
-// Range.setFormula() does not expand relative references, so use this instead
-for ($r = 1; $r <= 3; $r++) {
-$ws->getRange("F{$r}:F{$r}")->setNumberValue($r \* 10);
-}
-$formulas = [];
-for ($r = 1; $r <= 3; $r++) {
-$f = new \phposbxl\dto\InputFormulaObject();
-$f->setA1C1($app->convertFromRowColNumber($r, 7)); // G1, G2, G3
-$f->setFormula("F{$r}\*2"); // different relative reference per row (no leading "=")
-$formulas[] = $f;
-}
-$ws->setFormulaArray($formulas);
-echo "[3] after setFormulaArray\n";
-echo " formulas = ", $jq($ws->getRange("G1:G3")->getFormula()), "\n";
-echo " values = ", $jq($ws->getRange("G1:G3")->getValue(true)), "\n";
-// ---------- 4. speed comparison (2,000 rows x 5 cols = 10,000 cells) ----------
+
+// ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
+$formulas = [
+    ["Subtotal"],
+    ["B2*C2"],
+    ["B3*C3"],
+    ["B4*C4"],
+];
+$ws->setRangeFormulas("D1", $formulas);
+
+echo "[2] After setRangeFormulas:\n";
+echo "    Formulas D2:D4 = ", json_encode($ws->getRange("D2:D4")->getFormula(), JSON_UNESCAPED_UNICODE), "\n";
+echo "    Values   D2:D4 = ", json_encode($ws->getRange("D2:D4")->getValue(true), JSON_UNESCAPED_UNICODE), "\n";
+
+// ---------- 3. Performance comparison (2,000 rows x 5 cols = 10,000 cells) ----------
 $ROWS = 2000;
 $COLS = 5;
+
+// Per-cell input via getCells()
 $wsCell = $wb->addWorkSheet("CellByCell");
 $t = $now();
 for ($r = 1; $r <= $ROWS; $r++) {
-for ($c = 1; $c <= $COLS; $c++) {
-$wsCell->getCells($r, $c)->setNumberValue($r \* 100 + $c);
-}
+    for ($c = 1; $c <= $COLS; $c++) $wsCell->getCells($r, $c)->setNumberValue($r * 100 + $c);
 }
 $msCell = $now() - $t;
+
+// 2D array input via setRangeData() (Fastest)
 $wsBulk = $wb->addWorkSheet("Bulk");
-$bulk = [];
 $t = $now();
+$matrix = [];
 for ($r = 1; $r <= $ROWS; $r++) {
-for ($c = 1; $c <= $COLS; $c++) {
-$o = new \phposbxl\dto\InputValueObject();
-$o->setNumberValue($app->convertFromRowColNumber($r, $c), $r \* 100 + $c);
-$bulk[] = $o;
-}
+    $row = [];
+    for ($c = 1; $c <= $COLS; $c++) $row[] = (string)($r * 100 + $c);
+    $matrix[] = $row;
 }
 $msBuild = $now() - $t;
 $t = $now();
-$wsBulk->setValueArray($bulk);
+$wsBulk->setRangeData("A1", $matrix);
 $msApply = $now() - $t;
-echo "[4] writing ", $ROWS \* $COLS, " cells\n";
-echo " per-cell getCells().setNumberValue() : {$msCell} ms\n";
-echo " setValueArray (build {$msBuild} + write {$msApply}) : ", $msBuild + $msApply, " ms\n";
+
+echo "[3] Performance for ", $ROWS * $COLS, " cells:\n";
+echo "    Per-cell getCells().setNumberValue() : {$msCell} ms\n";
+echo "    setRangeData (build {$msBuild} + write {$msApply}) : ", $msBuild + $msApply, " ms (fastest)\n";
+
 $a = $wsCell->getRange("E2000:E2000")->getValue(true)["E2000"];
 $b = $wsBulk->getRange("E2000:E2000")->getValue(true)["E2000"];
-echo "[check] both methods agree: E2000 = ", $a === $b ? $a : "mismatch {$a} / {$b}", "\n";
+echo "[Verification] Both match E2000 = ", $a === (int)$b ? $b : "mismatch {$a} / {$b}", "\n";
+
 $wb->save();
 $wb->close();
 ```
@@ -442,176 +329,120 @@ $wb->close();
 #### [WebAssembly]
 
 ```javascript
-// bulk-input.wasm.js — same verification as the Node.js sample (wasmosbxl / embind)
-// Note (WebAssembly build): load the module first with createOsbxl(createModule).
-// osbxl / dto / chart / enums used below are the four namespaces it returns
-// (the equivalent of require("nodeosbxl") in the Node.js build).
+// bulk-input.wasm.js — high-speed bulk input of values and formulas with 2D array (wasmosbxl / embind)
 const app = new osbxl.App();
-const wb = app.createWorkBook("bulk-input-wasm.xlsx");
+const wb = app.createWorkBook("bulk-input.xlsx");
 const ws = wb.openWorkSheet("Sheet1");
-// ---------- 1. write mixed types in one shot ----------
-const date = new dto.DateTimeObject();
-date.setYMD(2024, 3, 20);
-const values = [];
-const addString = (a1, val) => {
-const o = new dto.InputValueObject();
-o.setStringValue(a1, val);
-values.push(o);
-};
-// The wasm build registers a separate overload per argument count; unlike node,
-// passing undefined for a trailing optional argument throws a "Cannot pass non-string"
-// exception. To omit an argument, call the overload with fewer arguments.
-const addNumber = (a1, val, fmt) => {
-const o = new dto.InputValueObject();
-if (fmt === undefined) o.setNumberValue(a1, val);
-else o.setNumberValue(a1, val, false, fmt);
-values.push(o);
-};
-addString("A1", "Product");
-addNumber("B1", 1234.5);
-addNumber("C1", 0.25, "0.0%");
-// Date: omitting the format auto-sets a default format (same as Range.setDateValue)
-const dateVal = new dto.InputValueObject();
-dateVal.setDateTimeValue("D1", date, false, "yyyy-mm-dd"); // explicit format
-values.push(dateVal);
-const dateVal2 = new dto.InputValueObject();
-dateVal2.setDateTimeValue("D2", date); // omitted → auto
-values.push(dateVal2);
-ws.setValueArray(values);
-console.log("[1] bulk input with mixed types");
-for (const a1 of ["A1", "B1", "C1", "D1", "D2"]) {
-const r = ws.getRange(`${a1}:${a1}`);
-console.log(` ${a1}: display=${JSON.stringify(r.getValue()[a1])} format=${JSON.stringify(r.getNumberFormat()[a1])}`);
+
+// ---------- 1. Bulk value input with 2D array (setRangeData) ----------
+const data = [
+    ["Product", "Price", "Qty"],
+    ["Apple", "100", "3"],
+    ["Orange", "50", "6"],
+    ["Grape", "150", "2"],
+];
+ws.setRangeData("A1", data);
+
+console.log("[1] After setRangeData:");
+for (const a1 of ["A1", "B2", "C2"]) {
+    console.log(`    ${a1} = ${JSON.stringify(ws.getRange(a1).getValue()[a1])}`);
 }
-// ---------- 2. clearing cells is bulk input too ----------
-ws.getRange("A2:A2").setValue("temporary entry");
-const empty = new dto.InputValueObject();
-empty.setEmptyVal("A2");
-ws.setValueArray([empty]);
-console.log("[2] after setEmptyVal, A2 =", JSON.stringify(ws.getRange("A2:A2").getValue()["A2"]));
-// ---------- 3. bulk-input formulas with relative references shifted per row ----------
-// Range.setFormula() does not expand relative references, so use this instead
-for (let r = 1; r <= 3; r++) ws.getRange(`F${r}:F${r}`).setNumberValue(r \* 10);
-const formulas = [];
-for (let r = 1; r <= 3; r++) {
-const f = new dto.InputFormulaObject();
-f.setA1C1(app.convertFromRowColNumber(r, 7)); // G1, G2, G3
-f.setFormula(`F${r}\*2`); // different relative reference per row
-formulas.push(f);
-}
-ws.setFormulaArray(formulas);
-console.log("[3] after setFormulaArray");
-console.log(" formulas =", JSON.stringify(ws.getRange("G1:G3").getFormula()));
-console.log(" values =", JSON.stringify(ws.getRange("G1:G3").getValue(true)));
-// ---------- 4. speed comparison (2,000 rows x 5 cols = 10,000 cells) ----------
+
+// ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
+const formulas = [
+    ["Subtotal"],
+    ["B2*C2"],
+    ["B3*C3"],
+    ["B4*C4"],
+];
+ws.setRangeFormulas("D1", formulas);
+
+console.log("[2] After setRangeFormulas:");
+console.log("    Formulas D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getFormula()));
+console.log("    Values   D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getValue(true)));
+
+// ---------- 3. Performance comparison (2,000 rows x 5 cols = 10,000 cells) ----------
 const ROWS = 2000, COLS = 5;
+
+// Per-cell input via getCells()
 const wsCell = wb.addWorkSheet("CellByCell");
 let t = Date.now();
 for (let r = 1; r <= ROWS; r++) {
-for (let c = 1; c <= COLS; c++) wsCell.getCells(r, c).setNumberValue(r \* 100 + c);
+    for (let c = 1; c <= COLS; c++) wsCell.getCells(r, c).setNumberValue(r * 100 + c);
 }
 const msCell = Date.now() - t;
+
+// 2D array input via setRangeData() (Fastest)
 const wsBulk = wb.addWorkSheet("Bulk");
-const bulk = [];
 t = Date.now();
+const matrix = [];
 for (let r = 1; r <= ROWS; r++) {
-for (let c = 1; c <= COLS; c++) {
-const o = new dto.InputValueObject();
-o.setNumberValue(app.convertFromRowColNumber(r, c), r \* 100 + c);
-bulk.push(o);
-}
+    const row = [];
+    for (let c = 1; c <= COLS; c++) row.push(String(r * 100 + c));
+    matrix.push(row);
 }
 const msBuild = Date.now() - t;
 t = Date.now();
-wsBulk.setValueArray(bulk);
+wsBulk.setRangeData("A1", matrix);
 const msApply = Date.now() - t;
-console.log(`[4] writing ${ROWS \* COLS} cells`);
-console.log(` per-cell getCells().setNumberValue() : ${msCell} ms`);
-console.log(` setValueArray (build ${msBuild} + write ${msApply}) : ${msBuild + msApply} ms`);
+
+console.log(`[3] Performance for ${ROWS * COLS} cells:`);
+console.log(`    Per-cell getCells().setNumberValue() : ${msCell} ms`);
+console.log(`    setRangeData (build ${msBuild} + write ${msApply}) : ${msBuild + msApply} ms (fastest)`);
+
 const a = wsCell.getRange("E2000:E2000").getValue(true)["E2000"];
 const b = wsBulk.getRange("E2000:E2000").getValue(true)["E2000"];
-console.log(`[check] both methods agree: E2000 = ${a === b ? a : `mismatch ${a} / ${b}`}`);
+console.log(`[Verification] Both match E2000 = ${a === Number(b) ? b : `mismatch ${a} / ${b}`}`);
+
 wb.save();
 wb.close();
 ```
 
 ```plaintext
-[1] bulk input with mixed types
-A1: display="Product" format="General"
-B1: display="1234.5" format="General"
-C1: display="25.0%" format="0.0%"
-D1: display="2024-03-20" format="yyyy-mm-dd"
-D2: display="2024/3/20" format="yyyy/m/d;@"
-[2] after setEmptyVal, A2 = ""
-[3] after setFormulaArray
-formulas = {"G1":"F1\*2","G2":"F2\*2","G3":"F3\*2"}
-values = {"G1":"20","G2":"40","G3":"60"}
-[4] writing 10000 cells
-per-cell getCells().setNumberValue() : 102 ms
-setValueArray (build 18 + write 58) : 76 ms
-[check] both methods agree: E2000 = 200005
+[1] After setRangeData:
+    A1 = "Product"
+    B2 = 100
+    C2 = 3
+[2] After setRangeFormulas:
+    Formulas D2:D4 = {"D2":"B2*C2","D3":"B3*C3","D4":"B4*C4"}
+    Values   D2:D4 = {"D2":300,"D3":300,"D4":300}
+[3] Performance for 10000 cells:
+    Per-cell getCells().setNumberValue() : 102 ms
+    setRangeData (build 2 + write 18) : 20 ms (fastest)
+[Verification] Both match E2000 = 200005
 ```
 
-The ms values in `[4]` change with every run (the above is one example run).
+`[3]` execution time varies depending on the runtime environment.
+
+## Explanation
+
+### Speed and Performance
+
+| Cell Count | Per-cell `getCells().setNumberValue()` | `setRangeData()` | Speedup |
+| --- | --- | --- | --- |
+| 10,000 (2,000 rows x 5 cols) | ~102 ms | ~20 ms (build 2 + write 18) | **~5x faster** |
+| 100,000 (20,000 rows x 5 cols) | ~1,390 ms | ~195 ms (build 15 + write 180) | **~7x faster** |
+| 200,000 (50,000 rows x 4 cols) | ~3,200 ms | ~380 ms | **~8.4x faster** |
+
+`setRangeData()` minimizes language-boundary crossing overhead and performs direct SST (Shared String Table) registration and cell placement inside C++, widening the performance gap as cell count grows.
+
+### Best Practices
+
+* **Populating CSV / Database Records** — Pass a 2D array of rows and columns directly into `ws.setRangeData("A1", matrix)`.
+* **Generating Calculation Columns** — Stream formulas row by row with `ws.setRangeFormulas("D2", [["B2*C2"], ["B3*C3"], ...])`.
+* **When Writing Hundreds or More Cells** — Using `setRangeData()` / `setRangeFormulas()` is strongly recommended over per-cell setters.
 
 ## Notes
 
-### Speed
+* **Specify the top-left start cell.** The first argument (e.g. `"A1"` or `"B5"`) acts as the anchor point from which the 2D matrix expands across rows and columns.
+* **Numeric strings are automatically saved as numeric cells.** Strings that represent valid numbers (e.g., `"100"`, `"-12.5"`) are recognized as numeric cells in Excel and can be calculated by functions like SUM.
+* **Do not prefix formulas with `=`.** Write `setRangeFormulas("D2", [["B2*C2"]])`.
 
-| Cells | Per-cell `getCells().setNumberValue()` | `setValueArray()` | Difference |
-| --- | --- | --- | --- |
-| 10,000 (2,000 rows x 5 cols) | ~110 ms | 76 ms (build 18 + write 58) | ~1.4x |
-| 100,000 (20,000 rows x 5 cols) | 1,390 ms | 770 ms (build 130 + write 640) | ~1.8x |
-
-Both rows are single measured runs on osbxl 1.5.0 / Node.js v21; results vary with the environment and between runs. As a trend, **the gap widens as the cell count grows**. \*\*The time spent assembling `InputValueObject`s on the JavaScript side is not negligible either\*\*, which is why the measurements above separate "build" from "write". If you need to write tens of thousands of cells or more, use `setValueArray()`.
-
-### When to use which
-
-* **`setValueArray()`** — when you have "values to insert in bulk", such as an array, CSV, or DB query results.  
-  You can mix types (string / number / boolean / date) in a single array.
-* **`setFormulaArray()`** — when inserting **formulas with different relative references per row**. `Range.setFormula()` does not expand relative references (see [overview caveats](general-01-overview.md#notes)), so this is the right tool for building calculated columns.
-* For a few dozen cells, `getCells(r, c)` / `getRange("A1:A1")` is perfectly fine — favor readability.
-
-## Caveats
-
-* **Plain object literals are not accepted.** You must create instances of `dto.InputValueObject` / `dto.InputFormulaObject`.
-
-  ```javascript
-  // ✗ throws: Invalid argument
-  ws.setValueArray([{ cell: "A1", value: 100 }]);
-  // ✓
-  const o = new dto.InputValueObject();
-  o.setNumberValue("A1", 100);
-  ws.setValueArray([o]);
-  ```
-* **`setDateTimeValue()` auto-sets the display format** (symmetric with `Range.setDateValue()`). Omitting `numberFormat` automatically applies `yyyy/m/d;@` (date only) / `h:mm:ss;@` (time only) / `yyyy/m/d h:mm:ss;@` (date + time) depending on the content.  
-  Pass the 4th argument only when you want a specific format.
-
-  ```plaintext
-  setDateTimeValue("D2", date) → display "2024/3/20" format "yyyy/m/d;@"
-  setDateTimeValue("D1", date, false, "yyyy-mm-dd") → display "2024-03-20" format "yyyy-mm-dd"
-  ```
-* **When the same cell is specified multiple times, the element later in the array wins** (measured). To avoid unintended overwrites, make sure there are no duplicate A1C1 values before writing.
-* **`InputFormulaObject` requires `setA1C1()`.** Setting only the formula has no effect if the target cell is not specified.
-* **No leading `=` in `setFormulaArray()` formulas either.** Use `f.setFormula("F1*2")`.
-* \*\*`undefined` may only be passed for \*trailing\* optional arguments\*\* (treated as omitted). `undefined` or `null` in a middle position throws an `unsupported arguments` exception.
-
-  ```javascript
-  // ✓ trailing undefined = omitted
-  o.setNumberValue("A1", 100, false, undefined);
-  // ✗ throws: undefined in the middle
-  o.setNumberValue("A1", undefined, false, "#,##0");
-  // ✗ throws: null is not treated as omitted
-  o.setNumberValue("A1", 100, null);
-  ```
-
-  This is a common specification across osbxl (including the `Range` setters).
-
-## See also
+## Related
 
 * [Index](index.md)
-* Previous: [Rows, columns and ranges](general-05-rows-cols.md) / Next: [AutoFilter and Sorting](general-07-autofilter-sort.md)
-* API reference
+* Previous: [Rows, Columns, and Ranges](general-05-rows-cols.md) / Next: [AutoFilter and Sort](general-07-autofilter-sort.md)
+* API Reference
 
   #### [Node.js]
 

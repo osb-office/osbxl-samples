@@ -73,20 +73,12 @@ const wb = app.createWorkBook("tables-comments.xlsx");
 const ws = wb.openWorkSheet("Sheet1");
 // ---------- データ投入（ヘッダ1行 + データ3行）----------
 const rows = [
-["商品名", "単価", "数量"],
-["リンゴ", 120, 3],
-["ミカン", 80, 5],
-["ブドウ", 300, 2],
+    ["商品名", "単価", "数量"],
+    ["リンゴ", "120", "3"],
+    ["ミカン", "80", "5"],
+    ["ブドウ", "300", "2"],
 ];
-const values = [];
-rows.forEach((row, ri) => row.forEach((cell, ci) => {
-const a1 = app.convertFromRowColNumber(ri + 1, ci + 1);
-const o = new dto.InputValueObject();
-if (typeof cell === "number") o.setNumberValue(a1, cell);
-else o.setStringValue(a1, cell);
-values.push(o);
-}));
-ws.setValueArray(values);
+ws.setRangeData("A1", rows);
 // ---------- 1. テーブルを作成 ----------
 const lo = ws.getListObjects();
 const table = lo.addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals
@@ -164,22 +156,12 @@ wb = app.createWorkBook("tables-comments-py.xlsx")
 ws = wb.openWorkSheet("Sheet1")
 # ---------- データ投入（ヘッダ1行 + データ3行）----------
 rows = [
-["商品名", "単価", "数量"],
-["リンゴ", 120, 3],
-["ミカン", 80, 5],
-["ブドウ", 300, 2],
+    ["商品名", "単価", "数量"],
+    ["リンゴ", "120", "3"],
+    ["ミカン", "80", "5"],
+    ["ブドウ", "300", "2"],
 ]
-values = []
-for ri, row in enumerate(rows):
-for ci, cell in enumerate(row):
-a1 = app.convertFromRowColNumber(ri + 1, ci + 1)
-o = pyosbxl.dto.InputValueObject()
-if isinstance(cell, (int, float)):
-o.setNumberValue(a1, cell)
-else:
-o.setStringValue(a1, cell)
-values.append(o)
-ws.setValueArray(values)
+ws.setRangeData("A1", rows)
 # ---------- 1. テーブルを作成 ----------
 lo = ws.getListObjects()
 table = lo.addList("Sales", "A1:C4", True, True) # useFirstRowAsHeader, insertTotals
@@ -288,28 +270,15 @@ public static void main(String[] args) {
 AppWrapper app = new AppWrapper();
 WorkBookWrapper wb = app.createWorkBook("tables-comments-java.xlsx");
 WorkSheetWrapper ws = wb.openWorkSheet("Sheet1");
-// ---------- データ投入（ヘッダ1行 + データ3行）----------
-Object[][] rows = {
-{"商品名", "単価", "数量"},
-{"リンゴ", 120, 3},
-{"ミカン", 80, 5},
-{"ブドウ", 300, 2},
-};
-List<InputValueObjectWrapper> values = new ArrayList<>();
-for (int ri = 0; ri < rows.length; ri++) {
-for (int ci = 0; ci < rows[ri].length; ci++) {
-String a1 = app.convertFromRowColNumber(ri + 1, ci + 1);
-InputValueObjectWrapper o = new InputValueObjectWrapper();
-if (rows[ri][ci] instanceof Number) {
-o.setNumberValue(a1, ((Number) rows[ri][ci]).doubleValue());
-} else {
-o.setStringValue(a1, (String) rows[ri][ci]);
-}
-values.add(o);
-}
-}
-ws.setValueArray(values);
-// ---------- 1. テーブルを作成 ----------
+        // ---------- データ投入（ヘッダ1行 + データ3行）----------
+        List<List<String>> rows = Arrays.asList(
+            Arrays.asList("商品名", "単価", "数量"),
+            Arrays.asList("リンゴ", "120", "3"),
+            Arrays.asList("ミカン", "80", "5"),
+            Arrays.asList("ブドウ", "300", "2")
+        );
+        ws.setRangeData("A1", rows);
+        // ---------- 1. テーブルを作成 ----------
 ListObjectsWrapper lo = ws.getListObjects();
 TableWrapper table = lo.addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals
 System.out.println("[1] テーブル作成");
@@ -393,25 +362,12 @@ $ws = $wb->openWorkSheet("Sheet1");
 $jq = fn($x): string => json\_encode($x, JSON\_UNESCAPED\_UNICODE | JSON\_UNESCAPED\_SLASHES);
 // ---------- データ投入（ヘッダ1行 + データ3行）----------
 $rows = [
-["商品名", "単価", "数量"],
-["リンゴ", 120, 3],
-["ミカン", 80, 5],
-["ブドウ", 300, 2],
+    ["商品名", "単価", "数量"],
+    ["リンゴ", "120", "3"],
+    ["ミカン", "80", "5"],
+    ["ブドウ", "300", "2"],
 ];
-$values = [];
-foreach ($rows as $ri => $row) {
-foreach ($row as $ci => $cell) {
-$a1 = $app->convertFromRowColNumber($ri + 1, $ci + 1);
-$o = new \phposbxl\dto\InputValueObject();
-if (is\_int($cell) || is\_float($cell)) {
-$o->setNumberValue($a1, $cell);
-} else {
-$o->setStringValue($a1, $cell);
-}
-$values[] = $o;
-}
-}
-$ws->setValueArray($values);
+$ws->setRangeData("A1", $rows);
 // ---------- 1. テーブルを作成 ----------
 $lo = $ws->getListObjects();
 $table = $lo->addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals
@@ -494,20 +450,12 @@ const wb = app.createWorkBook("tables-comments-wasm.xlsx");
 const ws = wb.openWorkSheet("Sheet1");
 // ---------- データ投入（ヘッダ1行 + データ3行）----------
 const rows = [
-["商品名", "単価", "数量"],
-["リンゴ", 120, 3],
-["ミカン", 80, 5],
-["ブドウ", 300, 2],
+    ["商品名", "単価", "数量"],
+    ["リンゴ", "120", "3"],
+    ["ミカン", "80", "5"],
+    ["ブドウ", "300", "2"],
 ];
-const values = [];
-rows.forEach((row, ri) => row.forEach((cell, ci) => {
-const a1 = app.convertFromRowColNumber(ri + 1, ci + 1);
-const o = new dto.InputValueObject();
-if (typeof cell === "number") o.setNumberValue(a1, cell);
-else o.setStringValue(a1, cell);
-values.push(o);
-}));
-ws.setValueArray(values);
+ws.setRangeData("A1", rows);
 // ---------- 1. テーブルを作成 ----------
 const lo = ws.getListObjects();
 const table = lo.addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals

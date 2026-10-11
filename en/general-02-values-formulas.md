@@ -113,15 +113,10 @@ ws.getRange(`B${row}:B${row}`).setNumberValue(price);
 ws.getRange(`C${row}:C${row}`).setNumberValue(qty);
 });
 // --- amount column (D2:D4) ---
-// Each row needs its own relative reference, so use setFormulaArray.
+// Each row needs its own relative reference, so use setRangeFormulas.
 // Formula strings do NOT take a leading "=".
-const formulas = data.map((\_, i) => {
-const f = new dto.InputFormulaObject();
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)); // D2, D3, D4
-f.setFormula(`B${i + 2}\*C${i + 2}`); // "B2\*C2" ...
-return f;
-});
-ws.setFormulaArray(formulas);
+const formulas = data.map((_, i) => [`B${i + 2}*C${i + 2}`]);
+ws.setRangeFormulas("D2", formulas);
 // --- total (D5) ---
 ws.getRange("C5:C5").setValue("Total");
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)");
@@ -156,15 +151,10 @@ ws.getRange(f"A{row}:A{row}").setValue(name)
 ws.getRange(f"B{row}:B{row}").setNumberValue(price)
 ws.getRange(f"C{row}:C{row}").setNumberValue(qty)
 # --- amount column (D2:D4) ---
-# Each row needs its own relative reference, so use setFormulaArray.
+# Each row needs its own relative reference, so use setRangeFormulas.
 # Formula strings do NOT take a leading "=".
-formulas = []
-for i in range(len(data)):
-f = pyosbxl.dto.InputFormulaObject()
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)) # D2, D3, D4
-f.setFormula(f"B{i + 2}\*C{i + 2}") # "B2\*C2" ...
-formulas.append(f)
-ws.setFormulaArray(formulas)
+formulas = [[f"B{i + 2}*C{i + 2}"] for i in range(len(data))]
+ws.setRangeFormulas("D2", formulas)
 # --- total (D5) ---
 ws.getRange("C5:C5").setValue("Total")
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)")
@@ -182,9 +172,9 @@ wb.close()
 
 ```java
 // values-formulas.java — same verification as the Node.js sample (javaosbxl)
-import com.osboffice.osbxl.\*;
-import com.osboffice.osbxl.dto.\*;
+import com.osboffice.osbxl.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 public class Main {
@@ -210,16 +200,13 @@ ws.getRange("B" + row + ":B" + row).setNumberValue(prices[i]);
 ws.getRange("C" + row + ":C" + row).setNumberValue(qtys[i]);
 }
 // --- amount column (D2:D4) ---
-// Each row needs its own relative reference, so use setFormulaArray.
+// Each row needs its own relative reference, so use setRangeFormulas.
 // Formula strings do NOT take a leading "=".
-List<InputFormulaObjectWrapper> formulas = new ArrayList<>();
+List<List<String>> formulas = new ArrayList<>();
 for (int i = 0; i < names.length; i++) {
-InputFormulaObjectWrapper f = new InputFormulaObjectWrapper();
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)); // D2, D3, D4
-f.setFormula("B" + (i + 2) + "\*C" + (i + 2)); // "B2\*C2" ...
-formulas.add(f);
+formulas.add(Collections.singletonList("B" + (i + 2) + "*C" + (i + 2)));
 }
-ws.setFormulaArray(formulas);
+ws.setRangeFormulas("D2", formulas);
 // --- total (D5) ---
 ws.getRange("C5:C5").setValue("Total");
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)");
@@ -260,17 +247,14 @@ $ws->getRange("B{$row}:B{$row}")->setNumberValue($price);
 $ws->getRange("C{$row}:C{$row}")->setNumberValue($qty);
 }
 // --- amount column (D2:D4) ---
-// Each row needs its own relative reference, so use setFormulaArray.
+// Each row needs its own relative reference, so use setRangeFormulas.
 // Formula strings do NOT take a leading "=".
 $formulas = [];
 for ($i = 0; $i < count($data); $i++) {
-$f = new \phposbxl\dto\InputFormulaObject();
-$row = $i + 2;
-$f->setA1C1($app->convertFromRowColNumber($i + 2, 4)); // D2, D3, D4
-$f->setFormula("B{$row}\*C{$row}"); // "B2\*C2" ...
-$formulas[] = $f;
+    $row = $i + 2;
+    $formulas[] = ["B{$row}*C{$row}"];
 }
-$ws->setFormulaArray($formulas);
+$ws->setRangeFormulas("D2", $formulas);
 // --- total (D5) ---
 $ws->getRange("C5:C5")->setValue("Total");
 $ws->getRange("D5:D5")->setFormula("SUM(D2:D4)");
@@ -297,27 +281,21 @@ const ws = wb.openWorkSheet("Sheet1"); // open the default sheet
 // --- header (row 1) ---
 // app.convertFromRowColNumber(row, col) gives the A1 address for (1,1) -> "A1"
 ["Product", "Unit Price", "Qty", "Amount"].forEach((text, i) => {
-const cell = app.convertFromRowColNumber(1, i + 1);
-ws.getRange(`${cell}:${cell}`).setValue(text);
+    const cell = app.convertFromRowColNumber(1, i + 1);
+    ws.getRange(`${cell}:${cell}`).setValue(text);
 });
 // --- detail rows (2-4) ---
 const data = [["Apple", 100, 3], ["Orange", 50, 6], ["Grape", 150, 2]];
 data.forEach(([name, price, qty], i) => {
-const row = i + 2;
-ws.getRange(`A${row}:A${row}`).setValue(name);
-ws.getRange(`B${row}:B${row}`).setNumberValue(price);
-ws.getRange(`C${row}:C${row}`).setNumberValue(qty);
+    const row = i + 2;
+    ws.getRange(`A${row}:A${row}`).setValue(name);
+    ws.getRange(`B${row}:B${row}`).setNumberValue(price);
+    ws.getRange(`C${row}:C${row}`).setNumberValue(qty);
 });
 // --- amount column (D2:D4) ---
-// Each row needs its own relative reference, so use setFormulaArray.
+// Each row needs its own relative reference, so use setRangeFormulas.
 // Formula strings do NOT take a leading "=".
-const formulas = data.map((\_, i) => {
-const f = new dto.InputFormulaObject();
-f.setA1C1(app.convertFromRowColNumber(i + 2, 4)); // D2, D3, D4
-f.setFormula(`B${i + 2}\*C${i + 2}`); // "B2\*C2" ...
-return f;
-});
-ws.setFormulaArray(formulas);
+ws.setRangeFormulas("D2", data.map((_, i) => [`B${i + 2}*C${i + 2}`]));
 // --- total (D5) ---
 ws.getRange("C5:C5").setValue("Total");
 ws.getRange("D5:D5").setFormula("SUM(D2:D4)");
@@ -349,7 +327,7 @@ Total: 900
 * **Do not prefix formulas with `=`.** Use `setFormula("SUM(A1:A3)")`, not `setFormula("=SUM(A1:A3)")`.
 * **`setValue` / `setNumberValue` on a multi-cell Range writes the same value to every cell.** `ws.getRange("A1:C1").setValue("X")` puts `"X"` into A1, B1 and C1.
 * **`setFormula()` does not auto-fill relative references.** `ws.getRange("B1:B3").setFormula("A1*2")` puts the formula into **B1 only**; B2 / B3 stay empty.  
-  The third argument variant `setFormula("A1*2", false, true)` (`setAllCell = true`) merely copies the same string into every cell — it does **not** become `A2*2`, `A3*2` (all of B1:B3 end up with the same value). To shift formulas per row, use **`setFormulaArray()` + `dto.InputFormulaObject`** (A1C1 and formula per cell) as in this sample.
+  The third argument variant `setFormula("A1*2", false, true)` (`setAllCell = true`) merely copies the same string into every cell — it does **not** become `A2*2`, `A3*2` (all of B1:B3 end up with the same value). To shift formulas per row, use **`setRangeFormulas()`** passing starting cell and a 2D array of formulas as in this sample.
 * **A license banner line is printed to stdout once per process.** Keep it in mind when parsing standard output.
 
 ## See also

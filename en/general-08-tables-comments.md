@@ -73,20 +73,12 @@ const wb = app.createWorkBook("tables-comments.xlsx");
 const ws = wb.openWorkSheet("Sheet1");
 // ---------- fill in the data (1 header row + 3 data rows) ----------
 const rows = [
-["Product", "Unit Price", "Qty"],
-["Apple", 120, 3],
-["Orange", 80, 5],
-["Grape", 300, 2],
+    ["Product", "Unit Price", "Qty"],
+    ["Apple", "120", "3"],
+    ["Orange", "80", "5"],
+    ["Grape", "300", "2"],
 ];
-const values = [];
-rows.forEach((row, ri) => row.forEach((cell, ci) => {
-const a1 = app.convertFromRowColNumber(ri + 1, ci + 1);
-const o = new dto.InputValueObject();
-if (typeof cell === "number") o.setNumberValue(a1, cell);
-else o.setStringValue(a1, cell);
-values.push(o);
-}));
-ws.setValueArray(values);
+ws.setRangeData("A1", rows);
 // ---------- 1. create the table ----------
 const lo = ws.getListObjects();
 const table = lo.addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals
@@ -164,22 +156,12 @@ wb = app.createWorkBook("tables-comments-py.xlsx")
 ws = wb.openWorkSheet("Sheet1")
 # ---------- fill in the data (1 header row + 3 data rows) ----------
 rows = [
-["Product", "Unit Price", "Qty"],
-["Apple", 120, 3],
-["Orange", 80, 5],
-["Grape", 300, 2],
+    ["Product", "Unit Price", "Qty"],
+    ["Apple", "120", "3"],
+    ["Orange", "80", "5"],
+    ["Grape", "300", "2"],
 ]
-values = []
-for ri, row in enumerate(rows):
-for ci, cell in enumerate(row):
-a1 = app.convertFromRowColNumber(ri + 1, ci + 1)
-o = pyosbxl.dto.InputValueObject()
-if isinstance(cell, (int, float)):
-o.setNumberValue(a1, cell)
-else:
-o.setStringValue(a1, cell)
-values.append(o)
-ws.setValueArray(values)
+ws.setRangeData("A1", rows)
 # ---------- 1. create the table ----------
 lo = ws.getListObjects()
 table = lo.addList("Sales", "A1:C4", True, True) # useFirstRowAsHeader, insertTotals
@@ -288,28 +270,15 @@ public static void main(String[] args) {
 AppWrapper app = new AppWrapper();
 WorkBookWrapper wb = app.createWorkBook("tables-comments-java.xlsx");
 WorkSheetWrapper ws = wb.openWorkSheet("Sheet1");
-// ---------- fill in the data (1 header row + 3 data rows) ----------
-Object[][] rows = {
-{"Product", "Unit Price", "Qty"},
-{"Apple", 120, 3},
-{"Orange", 80, 5},
-{"Grape", 300, 2},
-};
-List<InputValueObjectWrapper> values = new ArrayList<>();
-for (int ri = 0; ri < rows.length; ri++) {
-for (int ci = 0; ci < rows[ri].length; ci++) {
-String a1 = app.convertFromRowColNumber(ri + 1, ci + 1);
-InputValueObjectWrapper o = new InputValueObjectWrapper();
-if (rows[ri][ci] instanceof Number) {
-o.setNumberValue(a1, ((Number) rows[ri][ci]).doubleValue());
-} else {
-o.setStringValue(a1, (String) rows[ri][ci]);
-}
-values.add(o);
-}
-}
-ws.setValueArray(values);
-// ---------- 1. create the table ----------
+        // ---------- fill in the data (1 header row + 3 data rows) ----------
+        List<List<String>> rows = Arrays.asList(
+            Arrays.asList("Product", "Unit Price", "Qty"),
+            Arrays.asList("Apple", "120", "3"),
+            Arrays.asList("Orange", "80", "5"),
+            Arrays.asList("Grape", "300", "2")
+        );
+        ws.setRangeData("A1", rows);
+        // ---------- 1. create the table ----------
 ListObjectsWrapper lo = ws.getListObjects();
 TableWrapper table = lo.addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals
 System.out.println("[1] Table created");
@@ -393,25 +362,12 @@ $ws = $wb->openWorkSheet("Sheet1");
 $jq = fn($x): string => json\_encode($x, JSON\_UNESCAPED\_UNICODE | JSON\_UNESCAPED\_SLASHES);
 // ---------- fill in the data (1 header row + 3 data rows) ----------
 $rows = [
-["Product", "Unit Price", "Qty"],
-["Apple", 120, 3],
-["Orange", 80, 5],
-["Grape", 300, 2],
+    ["Product", "Unit Price", "Qty"],
+    ["Apple", "120", "3"],
+    ["Orange", "80", "5"],
+    ["Grape", "300", "2"],
 ];
-$values = [];
-foreach ($rows as $ri => $row) {
-foreach ($row as $ci => $cell) {
-$a1 = $app->convertFromRowColNumber($ri + 1, $ci + 1);
-$o = new \phposbxl\dto\InputValueObject();
-if (is\_int($cell) || is\_float($cell)) {
-$o->setNumberValue($a1, $cell);
-} else {
-$o->setStringValue($a1, $cell);
-}
-$values[] = $o;
-}
-}
-$ws->setValueArray($values);
+$ws->setRangeData("A1", $rows);
 // ---------- 1. create the table ----------
 $lo = $ws->getListObjects();
 $table = $lo->addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals
@@ -494,20 +450,12 @@ const wb = app.createWorkBook("tables-comments-wasm.xlsx");
 const ws = wb.openWorkSheet("Sheet1");
 // ---------- fill in the data (1 header row + 3 data rows) ----------
 const rows = [
-["Product", "Unit Price", "Qty"],
-["Apple", 120, 3],
-["Orange", 80, 5],
-["Grape", 300, 2],
+    ["Product", "Unit Price", "Qty"],
+    ["Apple", "120", "3"],
+    ["Orange", "80", "5"],
+    ["Grape", "300", "2"],
 ];
-const values = [];
-rows.forEach((row, ri) => row.forEach((cell, ci) => {
-const a1 = app.convertFromRowColNumber(ri + 1, ci + 1);
-const o = new dto.InputValueObject();
-if (typeof cell === "number") o.setNumberValue(a1, cell);
-else o.setStringValue(a1, cell);
-values.push(o);
-}));
-ws.setValueArray(values);
+ws.setRangeData("A1", rows);
 // ---------- 1. create the table ----------
 const lo = ws.getListObjects();
 const table = lo.addList("Sales", "A1:C4", true, true); // useFirstRowAsHeader, insertTotals

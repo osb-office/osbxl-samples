@@ -90,7 +90,7 @@ The table below uses Node.js names; the counts per namespace are common to all f
 | Namespace | Contents | Count |
 | --- | --- | --- |
 | `nodeosbxl` | Classes you operate on (App / WorkBook / WorkSheet / Range / Font / Chart entry points, etc.) | 29 classes |
-| `dto` | Objects used to pass data around (`InputValueObject`, `FontObject`, `ColorObject`, etc.) | 40 classes |
+| `dto` | Objects used to pass data around (`BordersObject`, `FontObject`, `ColorObject`, etc.) | 40 classes |
 | `chart` | Chart-specific objects (`ChartObject`, `Axis`, `ChartTitle`, etc.) | 43 classes |
 | `enums` | Excel-compatible enumerations (`XlFont`, `XlChartType`, `XlIndexColor`, etc.) | 127 kinds |
 
@@ -361,8 +361,8 @@ Corresponds to one sheet. **This is the gateway to the objects below it (Range /
 | `deleteRow(startRow, numOfRows)` | Deletes rows. |
 | `insertCol(startCol, numOfCols)` | Inserts columns. |
 | `deleteCol(startCol, numOfCols)` | Deletes columns. |
-| `setValueArray(values)` | Bulk-sets cell values. |
-| `setFormulaArray(formulas)` | Bulk-sets formulas. |
+| `setRangeData(startAddress, data)` | Ultra-fast bulk input of cell values using a 2D array (auto-detects numbers). |
+| `setRangeFormulas(startAddress, formulas)` | Ultra-fast bulk input of formulas using a 2D array. |
 
 Others (30): feature objects — `getFormatConditions` `getAutoFilter` `getSort` `getComments` `getHyperLinks` `getListObjects` `getPivotTables` `getShapes` `getWindow` `getHPageBreaks` `getVPageBreaks` / charts — `getChartObject` `addChartObject` `deleteChartObject` / print setup — `getPageSetupObject` `setPageSetupObject` / selection — `getActiveCell` `setActiveCell` / row, column and cell operations — `clearRow` `copyRow` `clearCol` `copyCol` `insertCell` `deleteCell` `clearCell` `copyCell` / outlining — `setRowOutline` `clearRowOutline` `setColOutline` `clearColOutline`
 
