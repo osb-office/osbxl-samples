@@ -57,8 +57,11 @@ osbxl が備えるコア機能を基準に、各オープンソース・著名�
 |---|---|:---:|:---:|---|
 | **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**8.329 秒** | ✕ 128MB上限超過 (OOM)<br>**22.01 MB** | **PhpSpreadsheet はメモリ上限超過で即死**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 22MB で安全完走**（ファイルサイズ 1.93MB）。 |
 | **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**15.740 秒** | ✕ 256MBヒープ枯渇 (OOM)<br>**42.13 MB** | **POI はヒープ枯渇で即死**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 42MB の軽量ヒープで完走**（SXSSFのような機能制限書き換え不要）。 |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 秒<br>**7.971 秒** | 864.66 MB<br>**2,667 MB** | ExcelJSは高速ストリーム出力可能だが**数式計算エンジン非搭載**。<br>nodeosbxlは**全数式のネイティブ計算を完結**して出力。 |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 秒<br>**8.307 秒** | 299.72 MB<br>**1,038 MB** | openpyxlは速いが**数式評価結果がすべて None**（Excel非起動下で値取得不可）。<br>pyosbxlは**ヘッドレス計算結果を保持**して完走。 |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 秒<br>**7.836 秒** | 864.66 MB<br>**1,060 MB**<br>(*Nodeヒープは31MB) | ExcelJSは高速ストリーム出力可能だが**数式計算エンジン非搭載**。<br>nodeosbxlは**全数式のネイティブ計算（依存関係グラフ展開）を完結**して出力。 |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 秒<br>**8.049 秒** | 299.72 MB<br>**964 MB** | openpyxlは速いが**数式評価結果がすべて None**（Excel非起動下で値取得不可）。<br>pyosbxlは**ヘッドレス計算結果を保持**して完走。 |
+
+> ※ **nodeosbxl / pyosbxl のメモリ特性について**:
+> nodeosbxl と pyosbxl は、Excel非起動下で約500関数の数式を即時評価するため、C++ネイティブメモリ上に20万セル規模の「計算依存関係グラフ」を展開します。そのため約950〜1,060MBのRSSを消費しますが、ランタイム言語側のヒープ消費はNode.jsでわずか31.5MBに抑えられています。数式計算機能を持たない単なるシリアライザー（ExcelJS / openpyxl）とはアーキテクチャが異なります。
 
 ### 既存オープンソースライブラリの限界詳細
 

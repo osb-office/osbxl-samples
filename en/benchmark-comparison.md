@@ -57,8 +57,11 @@ Benchmark measurements scaling data up to **50,000 rows × 4 columns = 200,000 c
 |---|---|:---:|:---:|---|
 | **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**8.329 s** | ✕ OOM (>128MB limit)<br>**22.01 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 22 MB** (generating a 1.93 MB .xlsx). |
 | **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**15.740 s** | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 s<br>**7.971 s** | 864.66 MB<br>**2,667 MB** | ExcelJS outputs XML fast but **lacks a formula calculation engine**.<br>nodeosbxl **evaluates and populates all formulas natively**. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 s<br>**8.307 s** | 299.72 MB<br>**1,038 MB** | openpyxl is fast but **formula results evaluate to None** in headless environments.<br>pyosbxl **retains evaluated formula values natively**. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 s<br>**7.836 s** | 864.66 MB<br>**1,060 MB**<br>(*Node heap is only 31 MB) | ExcelJS outputs XML fast but **lacks a formula calculation engine**.<br>nodeosbxl **evaluates and populates all formulas natively (resolving dependency graphs)**. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 s<br>**8.049 s** | 299.72 MB<br>**964 MB** | openpyxl is fast but **formula results evaluate to None** in headless environments.<br>pyosbxl **retains evaluated formula values natively**. |
+
+> *Note on Memory Characteristics for nodeosbxl / pyosbxl*:
+> nodeosbxl and pyosbxl allocate ~950–1,060 MB RSS because they construct a full native C++ formula dependency graph across ~500 functions for 200,000 cells to enable headless evaluation. The runtime language heap itself remains minimal (e.g. only 31.5 MB in Node.js). This differs fundamentally from pure stream serializers like ExcelJS or openpyxl, which perform no formula evaluation.
 
 ### Fatal Bottlenecks in Open-Source Libraries
 
