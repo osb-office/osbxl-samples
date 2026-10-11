@@ -90,8 +90,8 @@ Measured under the same development environment (Linux x86_64) generating a stan
 | Language | Library | Time (sec) | Memory (MB) | Highlights |
 |---|---|:---:|:---:|---|
 | **Java** (JDK 1.8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.622 s<br>**0.139 s** | 15.19 MB<br>**16.87 MB** | **osbxl is ~4.5x faster**.<br>POI carries heavy XML schema init overhead; osbxl starts and finishes instantly. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 0.059 s<br>**0.054 s** | 113.48 MB<br>**132.02 MB** | **nodeosbxl is slightly faster** (0.05s range).<br>Native C++ calculation engine included with no performance penalty. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | **0.019 s**<br>0.052 s | 53.57 MB<br>77.81 MB | openpyxl is fast but **cannot calculate formulas**.<br>pyosbxl completes full native calculation & output in 0.05s. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.059 s<br>**0.035 s** | 109.07 MB<br>**125.61 MB** | **nodeosbxl outperforms ExcelJS in the 0.03s range (~1.7x faster)**.<br>Under identical serialization mode (setOnlyMode), nodeosbxl beats ExcelJS with only 18 MB V8 heap consumption. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | **0.018 s**<br>0.032 s | 53.73 MB<br>70.84 MB | Under matching write-only mode, **pyosbxl finishes in 0.03s**.<br>Python heap usage is kept down to just 12 MB. |
 | **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.117 s<br>**0.122 s** | 26.00 MB<br>**2.00 MB** | Similar speed, but **phposbxl uses 13x less memory (only 2 MB)**.<br>Critical advantage under concurrent web downloads. |
 
 ### 3. Large-Scale 50,000-Row (200,000 Cells) Stress Test
@@ -100,13 +100,14 @@ Stress test results scaling data up to **50,000 rows × 4 columns = 200,000 cell
 
 | Runtime / Limits | Library | Execution Time | Memory Usage | Highlights & Fault Analysis |
 |---|---|:---:|:---:|---|
-| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**8.329 s** | ✕ OOM (>128MB limit)<br>**22.01 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 22 MB** (generating a 1.93 MB .xlsx). |
-| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**15.740 s** | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 s<br>**7.836 s** | 864.66 MB<br>**1,060 MB**<br>(*Node heap is only 31MB) | ExcelJS is a pure serializer that passes formula strings through without calculating (no formula engine).<br>nodeosbxl **constructs native dependency graphs and fully calculates all formulas**. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 s<br>**8.049 s** | 299.72 MB<br>**964 MB** | openpyxl performs zero formula calculations (values remain `None`).<br>pyosbxl **evaluates all formulas headlessly and stores confirmed results**. |
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**7.194 s**<br>*(setOnly: 2.348s)* | ✕ OOM (>128MB limit)<br>**32.00 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 32 MB** (generating a 1.93 MB .xlsx). |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**8.400 s**<br>*(setOnlyMode)* | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.165 s<br>**2.329 s** | 766.54 MB<br>**1,799 MB**<br>*(V8 heap: 20.9 MB)* | Under identical write-only conditions (setOnlyMode), nodeosbxl clocks in at 2.3s.<br>While ExcelJS inflates V8 heap (>420 MB), **nodeosbxl uses only 20.9 MB of V8 heap**. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.470 s<br>**2.433 s** | 378.28 MB<br>**1,439 MB**<br>*(Python heap: 28 MB)* | Under identical write-only conditions (setOnlyMode), **pyosbxl matches openpyxl at 2.4s**.<br>Python runtime heap usage is only 28 MB. |
 
-> 💡 **Why the Speed & Memory Difference? (Presence of Formula Engine)**:  
-> ExcelJS and openpyxl are "pure serializers without a formula calculation engine"; they simply pass formula strings as raw text into the XML without performing arithmetic calculation (values do not exist until opened in Excel). In contrast, nodeosbxl and pyosbxl evaluate ~500 functions headlessly by constructing a 200,000-cell dependency graph in native C++ memory, actively computing and populating all values (Node.js runtime heap is only 31.5 MB).  
+> 💡 **Memory Structure & Language Heap Safety**:  
+> ExcelJS and openpyxl keep every cell, row, and style as language-level objects in the runtime heap, rapidly consuming Node.js and Python heap limits (ExcelJS >420 MB, openpyxl >370 MB).<br>
+> In contrast, osbxl transfers 2D matrix data immediately into the C++ core engine. **Node.js V8 heap usage remains at a modest 20.9 MB for 50,000 rows, and Python heap is only 28 MB**, entirely preventing language runtime OOM heap crashes. The process Peak RSS represents temporary native working buffers used by the C++ core for multi-threaded XML generation and ZIP compression.  
 > 📖 **Full Feature Matrix & Detailed Analysis**: See [Excel Library Feature Comparison & Benchmark Report (en/benchmark-comparison.md)](en/benchmark-comparison.md).
 
 ---
