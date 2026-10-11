@@ -1,6 +1,6 @@
 # Excel Library Feature Comparison & Benchmark Performance Report
 
-**Last Updated: 2026/10/12**
+**Last Updated: 2026-10-12**
 
 [日本語版 (benchmark-comparison.md)](../ja/benchmark-comparison.md) | [Sample Collection Home (index.md)](index.md)
 

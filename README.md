@@ -67,7 +67,7 @@ osbxl-samples/
 
 ## 📊 Feature Comparison Matrix & Real-world Benchmarks
 
-**Last Updated: 2026/10/12**
+**Last Updated: 2026-10-12**
 
 A side-by-side comparison of advanced features (formula engine, PivotTables, charts, password encryption) and measured performance between popular open-source libraries and **osbxl**.
 
