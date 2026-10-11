@@ -71,6 +71,50 @@ osbxl-samples/
 
 ---
 
+## 📊 ライブラリ別 総合機能比較 ＆ 実測パフォーマンス
+
+実務のExcel自動生成で重要となる高度な機能（数式評価、ピボットテーブル、チャート、パスワード暗号化など）について、オープンソース主要ライブラリと **osbxl** の対応状況および実測性能です。
+
+### 1. 機能対応マトリクス
+
+| 機能項目 | osbxl (5言語共通) | Apache POI (Java) | openpyxl (Python) | PhpSpreadsheet (PHP) | ExcelJS / SheetJS (JS) |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **.xlsx 読み書き** | **◎ 高速・安定** | **◎** | **◎** | **◎** | **◎** |
+| **ヘッドレス数式評価**<br>(Excel非起動下での値計算) | **◎ 約500関数**<br>(XLOOKUP等含む) | **◯ 300〜400関数**<br>(Evaluator) | **✕ 非対応**<br>(Excel起動までNone) | **△ 一部のみ**<br>(重厚・関数限定) | **✕ 非対応**<br>(SheetJS無償版不可) |
+| **テーブル / 構造化参照**<br>(`SUM(Table[列名])` 等) | **◎ 完全対応・ネイティブ評価** | **△ 計算不可**<br>(保存のみ) | **✕ 評価不可** | **✕ 評価不可** | **✕ 評価不可** |
+| **オートフィルター** | **◎ 高度フィルター対応** | **◯** | **◯** | **◯** | **◯** |
+| **ピボットテーブル作成** | **◎ 標準API対応** | **◯ 低レイヤXML** | **△ 読み取り中心** | **✕ 非対応** | **✕ 非対応** |
+| **チャート・グラフ生成** | **◎ 2D / 3D 多数** | **◯ XDDF経由** | **◯ 2D/3D対応** | **△ 描画制約あり** | **✕〜△ 限定的** |
+| **パスワード暗号化 / 復号** | **◎ ビルトイン対応** | **◯ 標準対応** | **✕ 外部ツール要** | **✕ 拡張モジュール要** | **✕ 非対応** |
+| **コメント (新旧スレッド/メモ)** | **◎ スレッド・メモ両対応** | **◯ メモ対応** | **◯ コメント対応** | **◯ コメント対応** | **◯ コメント対応** |
+| **AIコード生成最適化** | **◎ 専用AI Skill提供**<br>(捏造・ハルシネーション0) | **✕ 非公式**<br>(架空API誤生成多発) | **✕ 非公式** | **✕ 非公式** | **✕ 非公式** |
+
+### 2. 実務の標準規模「200行（800セル）」実測ベンチマーク
+
+業務システムで最も頻出する帳票サイズ（**200行 × 4列 = 計800セル + SUM総合計数式**）を開発環境（Linux x86_64）で実測比較しました。
+
+| 言語 | ライブラリ | 処理時間 (秒) | メモリ消費 (MB) | 特徴・評価 |
+|---|---|:---:|:---:|---|
+| **Java** (JDK 1.8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.622 秒<br>**0.139 秒** | 15.19 MB<br>**16.87 MB** | **osbxl が約 4.5 倍高速**。<br>POIは巨大スキーマの初期化が重く、200行では osbxl が圧倒的に軽快。 |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 0.059 秒<br>**0.054 秒** | 113.48 MB<br>**132.02 MB** | **nodeosbxl が僅差で高速**（0.05秒台）。<br>C++ネイティブ計算エンジン内蔵ながら同等以上の高速性を発揮。 |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | **0.019 秒**<br>0.052 秒 | 53.57 MB<br>77.81 MB | openpyxlが最速だが**数式計算不可**。<br>pyosbxlは0.05秒で四則演算・SUMのネイティブ計算結果まで完了。 |
+| **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.117 秒<br>**0.122 秒** | 26.00 MB<br>**2.00 MB** | 処理時間は0.1秒台で互角だが、**メモリは phposbxl が 13 倍省メモリ（2MB）**。<br>Webサーバーでの並行ダウンロード時に致命的な差となります。 |
+
+### 3. 大規模データ限界負荷テスト「50,000行（200,000セル）」実測
+
+データ規模を **50,000行 × 4列 = 計200,000セル＋SUM集計** まで拡大した限界テスト結果です。既存ライブラリがメモリ枯渇（OOM）でクラッシュする中、osbxl は全言語で完走します。
+
+| 言語 / 環境 | ライブラリ | 処理時間 (秒) | メモリ消費 (MB) | 実測結果・限界検証 |
+|---|---|:---:|:---:|---|
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**8.329 秒** | ✕ 128MB上限突破 (OOM)<br>**22.01 MB** | **PhpSpreadsheet はメモリ上限超過で即死**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 22MB で安全完走**（ファイルサイズ 1.93MB）。 |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**15.740 秒** | ✕ 256MBヒープ枯渇 (OOM)<br>**42.13 MB** | **POI はヒープ枯渇で即死**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 42MB の軽量ヒープで完走**（SXSSFのような機能制限書き換え不要）。 |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 秒<br>**7.971 秒** | 864.66 MB<br>**2,667 MB** | ExcelJSは高速ストリーム出力可能だが**数式計算エンジン非搭載**。<br>nodeosbxlは**全数式のネイティブ計算を完結**して出力。 |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 秒<br>**8.307 秒** | 299.72 MB<br>**1,038 MB** | openpyxlは速いが**数式評価結果がすべて None**（Excel非起動下で値取得不可）。<br>pyosbxlは**ヘッドレス計算結果を保持**して完走。 |
+
+> 📖 **詳細な機能マトリクスと考察**: [Excelライブラリ 総合機能比較 ＆ ベンチマークレポート (ja/benchmark-comparison.md)](ja/benchmark-comparison.md) をご覧ください。
+
+---
+
 ## 🚀 クイックコード例
 
 ### Python (`pyosbxl`)
@@ -113,7 +157,9 @@ wb.close();
 ## 🔗 公式リンク・リソース
 
 - **公式サイト**: [https://osb-office.com/](https://osb-office.com/)
-- **主要Excelライブラリ比較（POI / openpyxl / PhpSpreadsheet）**: [https://osb-office.com/pages/comparison.php](https://osb-office.com/pages/comparison.php)
+- **Excelライブラリ 性能・機能比較**: [https://osb-office.com/pages/comparison.php](https://osb-office.com/pages/comparison.php)
+- **osbxl対著名ライブラリ詳細対比（200行 & 5万行）**: [https://osb-office.com/pages/members/benchmark_report.php](https://osb-office.com/pages/members/benchmark_report.php)
+- **負荷テスト実測レポート**: [https://osb-office.com/pages/members/tips.php](https://osb-office.com/pages/members/tips.php)
 - **公式 AI Skill ガイド & ダウンロード**: [https://osb-office.com/pages/ai-skill.php](https://osb-office.com/pages/ai-skill.php)
 - **Web サンプル集（動作確認済み）**: [https://osb-office.com/sample/](https://osb-office.com/sample/)
 - **製品特徴**: [https://osb-office.com/pages/features.php](https://osb-office.com/pages/features.php)

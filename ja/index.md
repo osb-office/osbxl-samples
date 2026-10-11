@@ -27,6 +27,7 @@
 | 条件付き書式（カラースケール・データバー・上位 N）を設定したい | [general-09 条件付き書式](general-09-conditional-format.md) |
 | グラフ（縦棒・折れ線）を作成したい | [general-10 チャート](general-10-charts.md) |
 | ピボットテーブルで集計したい | [general-11 ピボットテーブル](general-11-pivottables.md) |
+| 他ライブラリ（POI/openpyxl/PHP）との詳細機能対比・ベンチマーク | [ベンチマーク比較実測レポート](benchmark-comparison.md) |
 
 ## general — 概要・基本操作
 

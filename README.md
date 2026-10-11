@@ -65,6 +65,50 @@ osbxl-samples/
 
 ---
 
+## 📊 Feature Comparison Matrix & Real-world Benchmarks
+
+A side-by-side comparison of advanced features (formula engine, PivotTables, charts, password encryption) and measured performance between popular open-source libraries and **osbxl**.
+
+### 1. Feature Support Matrix
+
+| Feature | osbxl (5 Languages) | Apache POI (Java) | openpyxl (Python) | PhpSpreadsheet (PHP) | ExcelJS / SheetJS (JS) |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **.xlsx Read & Write** | **◎ Fast & Stable** | **◎** | **◎** | **◎** | **◎** |
+| **Headless Formula Calculation**<br>(Evaluating values without Excel) | **◎ ~500 Functions**<br>(XLOOKUP, VLOOKUP, etc.) | **◯ 300–400 Functions**<br>(Evaluator) | **✕ Not Supported**<br>(None until Excel opens) | **△ Partial**<br>(Heavy & limited) | **✕ Not Supported**<br>(Requires paid SheetJS Pro) |
+| **Tables & Structured References**<br>(e.g. `SUM(Table[Column])`) | **◎ Full Native Eval** | **△ No Calculation**<br>(Save only) | **✕ Cannot Eval** | **✕ Cannot Eval** | **✕ Cannot Eval** |
+| **AutoFilter** | **◎ Advanced Filter** | **◯** | **◯** | **◯** | **◯** |
+| **PivotTable Creation** | **◎ Standard API** | **◯ Low-level XML** | **△ Read-focused** | **✕ Not Supported** | **✕ Not Supported** |
+| **Chart & Graph Generation** | **◎ 2D & 3D Charts** | **◯ Via XDDF** | **◯ 2D/3D Support** | **△ Limited rendering** | **✕–△ Minimal** |
+| **Password Encryption / Decryption** | **◎ Built-in** | **◯ Standard** | **✕ Needs 3rd-party tool** | **✕ Needs extension** | **✕ Not Supported** |
+| **Cell Comments (Notes & Threads)** | **◎ Both Notes & Threads** | **◯ Notes only** | **◯ Comments only** | **◯ Comments only** | **◯ Comments only** |
+| **AI Codegen Optimization** | **◎ Official AI Skill**<br>(Zero hallucination) | **✕ Unofficial**<br>(Frequent fake APIs) | **✕ Unofficial** | **✕ Unofficial** | **✕ Unofficial** |
+
+### 2. Standard 200-Row (800-Cell) Benchmark
+
+Measured under the same development environment (Linux x86_64) generating a standard business report (**200 rows × 4 columns = 800 cells + SUM formula**).
+
+| Language | Library | Time (sec) | Memory (MB) | Highlights |
+|---|---|:---:|:---:|---|
+| **Java** (JDK 1.8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.622 s<br>**0.139 s** | 15.19 MB<br>**16.87 MB** | **osbxl is ~4.5x faster**.<br>POI carries heavy XML schema init overhead; osbxl starts and finishes instantly. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 0.059 s<br>**0.054 s** | 113.48 MB<br>**132.02 MB** | **nodeosbxl is slightly faster** (0.05s range).<br>Native C++ calculation engine included with no performance penalty. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | **0.019 s**<br>0.052 s | 53.57 MB<br>77.81 MB | openpyxl is fast but **cannot calculate formulas**.<br>pyosbxl completes full native calculation & output in 0.05s. |
+| **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.117 s<br>**0.122 s** | 26.00 MB<br>**2.00 MB** | Similar speed, but **phposbxl uses 13x less memory (only 2 MB)**.<br>Critical advantage under concurrent web downloads. |
+
+### 3. Large-Scale 50,000-Row (200,000 Cells) Stress Test
+
+Stress test results scaling data up to **50,000 rows × 4 columns = 200,000 cells + SUM formula**. While popular open-source libraries crash from out-of-memory errors, osbxl completes cleanly across all platforms.
+
+| Runtime / Limits | Library | Execution Time | Memory Usage | Highlights & Fault Analysis |
+|---|---|:---:|:---:|---|
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**8.329 s** | ✕ OOM (>128MB limit)<br>**22.01 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 22 MB** (generating a 1.93 MB .xlsx). |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**15.740 s** | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 s<br>**7.971 s** | 864.66 MB<br>**2,667 MB** | ExcelJS outputs XML fast but **lacks a formula calculation engine**.<br>nodeosbxl **evaluates and populates all formulas natively**. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 s<br>**8.307 s** | 299.72 MB<br>**1,038 MB** | openpyxl is fast but **formula results evaluate to None** in headless environments.<br>pyosbxl **retains evaluated formula values natively**. |
+
+> 📖 **Full Feature Matrix & Detailed Analysis**: See [Excel Library Feature Comparison & Benchmark Report (en/benchmark-comparison.md)](en/benchmark-comparison.md).
+
+---
+
 ## 🚀 Quick Code Examples
 
 ### Python (`pyosbxl`)
@@ -107,7 +151,9 @@ book.close();
 ## 🔗 Official Links & Documentation
 
 - **Official Website**: [https://osb-office.com/](https://osb-office.com/)
-- **Library Comparison & Benchmarks (vs POI, openpyxl, PhpSpreadsheet)**: [https://osb-office.com/en/pages/comparison.php](https://osb-office.com/en/pages/comparison.php)
+- **Excel Library Performance & Features**: [https://osb-office.com/en/pages/comparison.php](https://osb-office.com/en/pages/comparison.php)
+- **osbxl vs Famous Libraries Detailed Comparison (200 & 50,000 rows)**: [https://osb-office.com/en/pages/members/benchmark_report.php](https://osb-office.com/en/pages/members/benchmark_report.php)
+- **Load Test Benchmark Report**: [https://osb-office.com/en/pages/members/tips.php](https://osb-office.com/en/pages/members/tips.php)
 - **AI Skill Guide & Download**: [https://osb-office.com/pages/ai-skill.php](https://osb-office.com/pages/ai-skill.php)
 - **Interactive Web Samples**: [https://osb-office.com/sample/](https://osb-office.com/sample/)
 - **Product Features**: [https://osb-office.com/pages/features.php](https://osb-office.com/pages/features.php)

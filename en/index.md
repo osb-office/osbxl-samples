@@ -27,6 +27,7 @@ These osbxl samples have all been executed and verified. The code on each page r
 | Set conditional formatting (color scales, data bars, top N) | [general-09 Conditional formatting](general-09-conditional-format.md) |
 | Create charts (column, line) | [general-10 Charts](general-10-charts.md) |
 | Aggregate with pivot tables | [general-11 Pivot tables](general-11-pivottables.md) |
+| Detailed Feature Comparison & Benchmarks vs POI / openpyxl / PHP | [Benchmark Comparison Report](benchmark-comparison.md) |
 
 ## general — overview and basic operations
 
