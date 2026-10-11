@@ -102,11 +102,12 @@ Stress test results scaling data up to **50,000 rows × 4 columns = 200,000 cell
 |---|---|:---:|:---:|---|
 | **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**8.329 s** | ✕ OOM (>128MB limit)<br>**22.01 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 22 MB** (generating a 1.93 MB .xlsx). |
 | **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**15.740 s** | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 s<br>**7.836 s** | 864.66 MB<br>**1,060 MB**<br>(*Node heap is only 31MB) | ExcelJS outputs XML fast but **lacks a formula calculation engine**.<br>nodeosbxl **evaluates and populates all formulas natively (resolving dependency graphs)**. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 s<br>**8.049 s** | 299.72 MB<br>**964 MB** | openpyxl is fast but **formula results evaluate to None** in headless environments.<br>pyosbxl **retains evaluated formula values natively**. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** | 1.379 s<br>**7.836 s** | 864.66 MB<br>**1,060 MB**<br>(*Node heap is only 31MB) | ExcelJS is a pure serializer that passes formula strings through without calculating (no formula engine).<br>nodeosbxl **constructs native dependency graphs and fully calculates all formulas**. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** | 2.529 s<br>**8.049 s** | 299.72 MB<br>**964 MB** | openpyxl performs zero formula calculations (values remain `None`).<br>pyosbxl **evaluates all formulas headlessly and stores confirmed results**. |
 
+> 💡 **Why the Speed & Memory Difference? (Presence of Formula Engine)**:  
+> ExcelJS and openpyxl are "pure serializers without a formula calculation engine"; they simply pass formula strings as raw text into the XML without performing arithmetic calculation (values do not exist until opened in Excel). In contrast, nodeosbxl and pyosbxl evaluate ~500 functions headlessly by constructing a 200,000-cell dependency graph in native C++ memory, actively computing and populating all values (Node.js runtime heap is only 31.5 MB).  
 > 📖 **Full Feature Matrix & Detailed Analysis**: See [Excel Library Feature Comparison & Benchmark Report (en/benchmark-comparison.md)](en/benchmark-comparison.md).
-> *Note: nodeosbxl and pyosbxl allocate ~950–1,000 MB RSS because they construct a full native formula dependency graph for headless calculation across ~500 functions (Node.js runtime heap is only 31 MB). This differs fundamentally from pure stream serializers like ExcelJS or openpyxl, which perform no formula evaluation.
 
 ---
 
