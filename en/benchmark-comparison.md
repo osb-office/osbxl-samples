@@ -1,5 +1,7 @@
 # Excel Library Feature Comparison & Benchmark Performance Report
 
+**Last Updated: 2026/10/12**
+
 [日本語版 (benchmark-comparison.md)](../ja/benchmark-comparison.md) | [Sample Collection Home (index.md)](index.md)
 
 This technical report details the **comprehensive feature matrix** and **real-world benchmarks** (from 200 rows up to 50,000 rows) comparing **osbxl** (Java, Python, Node.js, PHP, WebAssembly) against popular open-source spreadsheet libraries (Apache POI, openpyxl, PhpSpreadsheet, ExcelJS / SheetJS).
@@ -8,42 +10,40 @@ This technical report details the **comprehensive feature matrix** and **real-wo
 
 ## 1. Feature Support Matrix
 
-A side-by-side comparison baseline covering core capabilities required in production systems:
-
-| Category | Feature Item | osbxl (5 Languages) | Apache POI (Java) | openpyxl (Python) | PhpSpreadsheet (PHP) | ExcelJS / SheetJS (JS) |
+| Category | Feature | osbxl (5 Languages Unified) | Apache POI (Java) | openpyxl (Python) | PhpSpreadsheet (PHP) | ExcelJS / SheetJS (JS) |
 |---|---|:---:|:---:|:---:|:---:|:---:|
-| **Basic I/O** | .xlsx Read & Write | **◎** | **◎** | **◎** | **◎** | **◎** |
-| | Memory Stability on Big Data | **◎** (Flat footprint) | **△** (XSSF OOM; SXSSF constrained) | **△** (High lag on scale) | **✕** (Fatal OOM at 128MB) | **◯ / △** (V8 Heap limit) |
-| **Formulas** | Formula Writing (`setFormula`) | **◎** | **◎** | **◎** | **◎** | **◎** |
-| | **Headless Formula Evaluation**<br>(Evaluating values without Excel) | **◎ ~500 Functions**<br>(XLOOKUP, VLOOKUP, etc.) | **◯ ~300–400 Functions**<br>(Evaluator) | **✕ Not Supported**<br>(Always None until Excel opens) | **△ Partial only**<br>(Slow & limited functions) | **✕ Not Supported**<br>(Requires paid SheetJS Pro) |
-| **Tables** | Table Creation (`ListObject`) | **◎** | **◯** (CTTable low-level XML) | **◯** (Table class) | **◯** (Table class) | **◯** (addTable) |
-| | Totals Row & Custom Formulas | **◎** (`setTotalRowFunction`) | **◯** | **△** (Restricted) | **△** (Complex setup) | **△** (Basic sum only) |
-| | **Structured References**<br>(e.g. `SUM(Table[Column])`) | **◎ Full Native Eval** | **△ Save only**<br>(Cannot calculate) | **✕ Cannot Eval** | **✕ Cannot Eval** | **✕ Cannot Eval** |
-| **Filtering** | **AutoFilter & Criteria Evaluation** | **◎ Fast C++ Eval** | **◯** | **△** (Manual script needed) | **△** | **✕** (Range set only) |
-| | Multi-column Sort | **◎** | **△** | **△** | **△** | **✕** |
-| **Advanced** | **PivotTable Creation** | **◎** (`PivotTable`) | **◯** (Low-level XML) | **△** (Read-focused) | **✕ Not Supported** | **✕ Not Supported** |
-| | **Chart & Graph Generation** | **◎ 2D/3D Charts** | **◯** (Via XDDF) | **◯** (2D/3D support) | **△** (Render bugs) | **✕–△** (Minimal) |
-| | Conditional Formatting | **◎ Color scales, DataBars** | **◯** | **◯** | **◯** | **◯** |
-| **Security** | **Password-Encrypted .xlsx Export** | **◎** (`save(..., pwd)`) | **◯** (`Biff8EncryptionKey`) | **✕ Not Supported**<br>(Requires external tool) | **✕ Not Supported**<br>(Requires extensions) | **✕ Not Supported** |
-| | Decrypting & Reading Protected .xlsx | **◎** (`open(..., pwd)`) | **◯** | **✕ Not Supported** | **✕ Not Supported** | **✕ Not Supported** |
-| **Others** | Comments & Threaded Notes | **◎ Both Notes & Threads** | **◯** (Notes only) | **◯** (Comments only) | **◯** (Comments only) | **◯** (Comments only) |
-| | **Identical Cross-Language API** | **◎ 100% Identical (5 Langs)** | **✕** (Java only) | **✕** (Python only) | **✕** (PHP only) | **✕** (JS only) |
-| | **Official AI Skill (No Hallucination)** | **◎ Zero Hallucination** | **✕** (Frequent fake APIs) | **✕** (Version confusion) | **✕** (High error rate) | **✕** (High error rate) |
+| **Basic I/O** | Read & Save `.xlsx` | **◎** | **◎** | **◎** | **◎** | **◎** |
+| | Large File Stability | **◎** (Constant memory) | **△** (XSSF OOMs, SXSSF limited) | **△** (Slows with row count) | **✕** (Frequent OOM at 128MB) | **◯ / △** (V8 heap bound) |
+| **Formula Engine** | Write Formulas (`setFormula`) | **◎** | **◎** | **◎** | **◎** | **◎** |
+| | **Headless Formula Evaluation**<br>(Calculate values without Excel) | **◎ ~500 functions**<br>(XLOOKUP, VLOOKUP, etc.) | **◯ ~300-400 functions**<br>(Built-in Evaluator) | **✕ Not supported**<br>(Values remain None) | **△ Partial only**<br>(Complex functions slow/unsupported) | **✕ Not supported**<br>(Commercial SheetJS Pro only) |
+| **Tables** | Create Tables (`ListObject`) | **◎** | **◯** (Low-level CTTable) | **◯** (Table class) | **◯** (Table class) | **◯** (addTable) |
+| | Total Row / Custom Formulas | **◎** (`setTotalRowFunction`) | **◯** | **△** (Limited) | **△** (Complex setup) | **△** (Basic aggregations only) |
+| | **Structured References**<br>(e.g., `SUM(Table[Column])`) | **◎ Full native evaluation** | **△** (Save only, no calc) | **✕ Cannot evaluate** | **✕ Cannot evaluate** | **✕ Cannot evaluate** |
+| **AutoFilter** | **Filter & Evaluation** | **◎ High performance** | **◯** | **△** (Manual script needed) | **△** | **✕** (Range definition only) |
+| | Multi-Key Sort (`Sort`) | **◎** | **△** | **△** | **△** | **✕** |
+| **Advanced** | **Create PivotTables** | **◎** (`PivotTable`) | **◯** (Complex low-level XML) | **△** (Read-only / limited) | **✕ Not supported** | **✕ Not supported** |
+| | **Chart Generation** | **◎ 2D/3D supported** | **◯** (Via XDDF) | **◯** (2D/3D support) | **△** (Constrained / buggy) | **✕~△** (ExcelJS is limited) |
+| | Conditional Formatting | **◎ DataBars, ColorScales** | **◯** | **◯** | **◯** | **◯** |
+| **Security** | **Password Encryption** | **◎** (`save(..., pwd)`) | **◯** (`Biff8EncryptionKey`) | **✕ Not supported** (Needs 3rd party) | **✕ Not supported** | **✕ Not supported** |
+| | Read Password Protected | **◎** (`open(..., pwd)`) | **◯** | **✕ Not supported** | **✕ Not supported** | **✕ Not supported** |
+| **Others** | Comments / Threaded Notes | **◎ Both threaded & legacy** | **◯** | **◯** | **◯** | **◯** |
+| | **Cross-Platform Unified API** | **◎ 100% Identical** | **✕** (Java only) | **✕** (Python only) | **✕** (PHP only) | **✕** (JS only) |
+| | **AI Coding Skill Optimization** | **◎ Official Skill included** | **✕** (Hallucinations frequent) | **✕** (Version confusion) | **✕** (High AI error rate) | **✕** (High AI error rate) |
 
 ---
 
-## 2. Standard Business Workload Benchmark (200 rows / 800 cells)
+## 2. Standard Workload Benchmark (200 rows / 800 cells)
 
-Measured under identical development machine conditions (Linux x86_64) generating a standard business sales report (**200 rows × 4 columns = 800 cells + SUM formula**).
+Measured on representative business reporting workload (200 rows × 4 columns = 800 cells + SUM formula) under identical Linux x86_64 environments.
 
-### Real-world Benchmark Measurements
+### Results Comparison
 
-| Runtime / Language | Library | Execution Time | Memory Usage | Highlights & Analysis |
+| Language / Env | Library | Execution Time | Memory Usage | Highlights & Analysis |
 |---|---|:---:|:---:|---|
-| **Java** (JDK 1.8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.622 s<br>**0.139 s** | 15.19 MB<br>**16.87 MB** | **osbxl is ~4.5x faster**.<br>POI carries heavy XML schema init overhead; osbxl C++ core starts and finishes instantly. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.059 s<br>**0.035 s** | 109.07 MB<br>**125.61 MB** | **nodeosbxl outperforms ExcelJS in the 0.03s range (~1.7x faster)**.<br>Under identical serialization mode (setOnlyMode), nodeosbxl beats ExcelJS with only 18 MB V8 heap consumption. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | **0.018 s**<br>0.032 s | 53.73 MB<br>70.84 MB | Under matching write-only mode, **pyosbxl finishes in 0.03s**.<br>Python heap usage is kept down to just 12 MB. |
-| **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.117 s<br>**0.122 s** | 26.00 MB<br>**2.00 MB** | Comparable speed, but **phposbxl uses 13x less memory (only 2 MB)**.<br>Decisive advantage for concurrent web downloads. |
+| **Java** (JDK 1.8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.652 s<br>**0.105 s** | 15.11 MB<br>**16.86 MB** | **osbxl is ~6.2x faster** (0.105s).<br>POI is delayed by schema class initializations. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.056 s<br>**0.016 s** | 103.95 MB<br>**121.14 MB** | **nodeosbxl is ~3.5x faster (0.016s)**.<br>Far outperforms ExcelJS (0.056s). |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 0.017 s<br>**0.016 s** | 53.20 MB<br>**69.91 MB** | In write-only mode, **pyosbxl achieves 0.016s, beating openpyxl**.<br>Python heap usage is only 12 MB. |
+| **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.073 s<br>**0.024 s** | 26.00 MB<br>**2.00 MB** | **phposbxl is ~3x faster & 13x more memory efficient (2 MB)**.<br>Critical advantage for concurrent web requests. |
 
 ---
 
@@ -55,10 +55,10 @@ Benchmark measurements scaling data up to **50,000 rows × 4 columns = 200,000 c
 
 | Runtime / Limits | Library | Execution Time | Memory Usage | Highlights & Fault Analysis |
 |---|---|:---:|:---:|---|
-| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**5.941 s** | ✕ OOM (>128MB limit)<br>**32.00 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 32 MB** (generating a 1.93 MB .xlsx). |
-| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**12.813 s** | ✕ OOM (>256MB heap)<br>**42.13 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly within 42 MB** without requiring rewriting to restricted SXSSF streaming mode. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.165 s<br>**2.329 s** | 766.54 MB<br>**1,799 MB**<br>*(V8 heap: 20.9 MB)* | Under identical write-only conditions (setOnlyMode), nodeosbxl clocks in at 2.3s.<br>While ExcelJS inflates V8 heap (>420 MB), **nodeosbxl uses only 20.9 MB of V8 heap**. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.470 s<br>**2.433 s** | 378.28 MB<br>**1,439 MB**<br>*(Python heap: 28 MB)* | Under identical write-only conditions (setOnlyMode), **pyosbxl matches openpyxl at 2.4s**.<br>Python runtime heap usage is only 28 MB. |
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ Crashed<br>**5.836 s** | ✕ OOM (>128MB limit)<br>**32.00 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely using only 32 MB** (generating a 1.93 MB .xlsx). |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ Crashed<br>**6.394 s** | ✕ OOM (>256MB heap)<br>**36.19 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly in 6.39s within 36 MB** without requiring rewriting to restricted SXSSF streaming mode. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.218 s<br>**1.798 s** | 772.11 MB<br>**1,836 MB**<br>*(V8 Heap: 20.9MB)* | **nodeosbxl achieves 1.79s**.<br>V8 heap usage is kept down to just 20.9 MB, preventing Node.js crashes. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.500 s<br>**1.900 s** | 377.93 MB<br>**1,445 MB**<br>*(Python Heap: 28MB)* | **pyosbxl achieves 1.900s (beating openpyxl's 2.500s)**.<br>Python heap remains at just 28 MB. |
 
 > 💡 **Memory Structure & Language Heap Safety**:  
 > - **Open-Source Libraries (ExcelJS / openpyxl)**:  
@@ -70,52 +70,22 @@ Benchmark measurements scaling data up to **50,000 rows × 4 columns = 200,000 c
 
 - **PhpSpreadsheet (PHP 8.5)**:
   `Fatal error: Allowed memory size of 134217728 bytes exhausted`
-  &rarr; Blew past the standard 128 MB PHP memory ceiling and crashed immediately during StringTable generation.
+  &rarr; Exceeds the standard 128 MB PHP memory limit during StringTable generation and crashes immediately.
 - **Apache POI (Java JDK 1.8)**:
   `java.lang.OutOfMemoryError: Java heap space`
-  &rarr; Crashed under standard 256 MB heap. Forced to rewrite using `SXSSF` streaming mode (which forbids formula re-evaluation, reading back, and random access).
+  &rarr; Exhausts the 256 MB max heap limit building the DOM tree. Rewriting to SXSSF streaming disables formula re-evaluation, structured references, and random access.
+- **openpyxl (Python 3.14)**:
+  Has no calculation engine; cell values remain `None` in headless environments.
+- **ExcelJS (Node.js v24)**:
+  Lacks PivotTable and formula computation features while consuming large V8 memory buffers.
 
 ---
 
-## 4. Summary of Critical Limitations in Existing OSS Libraries
+## 4. Conclusion: The Decisive Advantages of osbxl
 
-### 1. openpyxl (Python)
-- **Critical Flaw**: **Zero formula evaluation in headless environments**.
-  - Cell values remain `None` unless opened in the Excel desktop application.
-  - Cannot export password-encrypted workbooks without third-party tools.
-
-### 2. PhpSpreadsheet (PHP)
-- **Critical Flaw**: **Extravagant memory footprint and missing PivotTables**.
-  - Consumes 26 MB for just 200 rows, guaranteeing `Allowed memory size exhausted` crashes at scale.
-  - No PivotTable generation; no built-in password encryption/decryption.
-
-### 3. Apache POI (Java)
-- **Critical Flaw**: **OOM heap blowups and SXSSF API crippling**.
-  - Default `XSSFWorkbook` crashes at 50,000 rows on 256 MB heaps.
-  - SXSSF streaming loses random access, structured reference evaluation, and formula readback.
-
-### 4. ExcelJS / SheetJS (Node.js)
-- **Critical Flaw**: **Lack of formula calculation engines and PivotTables**.
-  - Free versions are merely serializing writers without calculation capabilities.
-
----
-
-## 5. Conclusion: Why osbxl?
-
-1. **Daily Workloads (200 rows)**:
-   - ~4.5x faster in Java, 13x less memory in PHP, 0.05–0.1s instant responses across all 5 languages.
-2. **Absolute Functional Superiority**:
-   - **Headless evaluation of ~500 Excel formulas**
-   - **Structured references, PivotTables, and 2D/3D charts**
-   - **Built-in AES password encryption and decryption**
-   - No other spreadsheet library in the modern software landscape delivers these capabilities through a single unified API across 5 languages.
-
----
-
-## 🔗 Official Links
-
-- [Official Website](https://osb-office.com/)
-- [Library Comparison & Benchmarks](https://osb-office.com/en/pages/comparison.php)
-- [Official AI Skill Guide & Download](https://osb-office.com/pages/ai-skill.php)
-- [Interactive Web Samples](https://osb-office.com/sample/)
-
+1. **Everyday Reporting (200 rows)**:
+   - 6.2x faster on Java, 3x faster & 13x less memory on PHP, 0.01s - 0.1s blazing responsiveness across all languages.
+2. **Heavy-Duty Reporting (50,000 rows)**:
+   - Safely finishes in mere seconds using minimal memory where open-source options suffer fatal OOM crashes.
+3. **Cross-Language Consistency**:
+   - ~500 headless formula functions, PivotTables, 2D/3D charts, and encryption under the exact same API across all 5 languages.
