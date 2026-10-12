@@ -65,6 +65,9 @@ Benchmark measurements scaling data up to **50,000 rows × 4 columns = 200,000 c
 >   Keep every cell, row, and style as language-level objects in the runtime heap, rapidly consuming Node.js and Python heap limits (ExcelJS >420 MB, openpyxl >370 MB).
 > - **osbxl (nodeosbxl / pyosbxl)**:  
 >   Transfers 2D matrix data immediately into the C++ core engine. **Node.js V8 heap usage remains at a modest 20.9 MB for 50,000 rows, and Python heap is only 28 MB**, entirely preventing language runtime OOM heap crashes. The process Peak RSS represents temporary native working buffers used by the C++ core for multi-threaded XML generation and ZIP compression.
+> - **Why `setOnlyMode` Was Applied for Node.js / Python**:  
+>   Competing open-source libraries (**openpyxl** and **ExcelJS**) do not implement a formula calculation engine (they merely serialize formula text into XML). Measuring them against osbxl's default mode—which recalculates all formula dependencies dynamically in real time—would be an unfair comparison. Therefore, osbxl was benchmarked in **`setOnlyMode = true`** (setting formulas without intermediate evaluation) to match the write-only baseline of the OSS libraries.  
+>   While real-time formula evaluation results (`getValue()`) are skipped during script execution in `setOnlyMode`, **the resulting `.xlsx` file is automatically calculated and displayed normally when opened later in Excel on Windows**. This makes it an ideal high-speed mode for export-only web reporting.
 
 ### Fatal Bottlenecks in Open-Source Libraries
 
