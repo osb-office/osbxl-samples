@@ -1,0 +1,27 @@
+{
+  "name": "osbxl-samples",
+  "version": "1.0.0",
+  "description": "> **[🇯🇵 日本語版の README はこちら (README.ja.md)](README.ja.md)**",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osb-office/osbxl-samples.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/osb-office/osbxl-samples/issues"
+  },
+  "homepage": "https://github.com/osb-office/osbxl-samples#readme",
+  "dependencies": {
+    "zenn-cli": "^0.5.6"
+  }
+}
