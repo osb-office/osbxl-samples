@@ -138,5 +138,6 @@ Excel 出力機能でパフォーマンスやメモリ不足、数式評価の�
 
 ### 関連リンク
 - 実際のコード例・再現手順: [GitHub osbxl-samples](https://github.com/osb-office/osbxl-samples)
+- 【最新】3OS総合負荷テスト実測レポート: [Linux / macOS (Apple M4) / Windows 総合負荷テスト＆アーキテクチャ考察（500〜50,000行）](https://github.com/osb-office/osbxl-samples/blob/main/benchmarks/BENCHMARK_REPORT_3OS.md)
 - 公式サイト & 無料トライアル: [osbxl Official Site](https://osb-office.com/)
 

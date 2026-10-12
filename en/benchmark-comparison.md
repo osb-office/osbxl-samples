@@ -6,6 +6,9 @@
 
 This technical report details the **comprehensive feature matrix** and **real-world benchmarks** (from 200 rows up to 50,000 rows) comparing **osbxl** (Java, Python, Node.js, PHP, WebAssembly) against popular open-source spreadsheet libraries (Apache POI, openpyxl, PhpSpreadsheet, ExcelJS / SheetJS).
 
+> 🚀 **Latest 3-OS Comprehensive Stress Benchmark Report**:  
+> For in-depth benchmarks across **Linux (x86_64), macOS (Apple Silicon M4), and Windows (x64)** under identical test conditions (500 to 50,000 rows / 200,000 cells) across 4 programming languages, see **[3-OS Excel Benchmark & Architecture Report](../benchmarks/BENCHMARK_REPORT_3OS.md)**. Covers cross-platform memory limits (OOM), M4 throughput jumps, and `setOnlyMode` best practices.
+
 ---
 
 ## 1. Feature Support Matrix

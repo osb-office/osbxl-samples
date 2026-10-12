@@ -28,6 +28,7 @@ These osbxl samples have all been executed and verified. The code on each page r
 | Create charts (column, line) | [general-10 Charts](general-10-charts.md) |
 | Aggregate with pivot tables | [general-11 Pivot tables](general-11-pivottables.md) |
 | Detailed Feature Comparison & Benchmarks vs POI / openpyxl / PHP | [Benchmark Comparison Report](benchmark-comparison.md) |
+| Linux / macOS (M4) / Windows 3-OS Stress Benchmark (500 to 50k rows) | [3-OS Benchmark & Architecture Report](../benchmarks/BENCHMARK_REPORT_3OS.md) |
 
 ## general — overview and basic operations
 

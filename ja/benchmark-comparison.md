@@ -6,6 +6,9 @@
 
 本ドキュメントは、**osbxl**（Java / Python / Node.js / PHP / WebAssembly）と主要オープンソース Excel ライブラリ（Apache POI、openpyxl、PhpSpreadsheet、ExcelJS / SheetJS）の**詳細な機能サポート範囲の対比**、および**実務標準（200行）から大規模（50,000行）までの実測性能ベンチマーク**をまとめた技術資料です。
 
+> 🚀 **最新の 3OS 負荷実測レポートはこちら**:  
+> Linux (x86_64)・macOS (Apple Silicon M4)・Windows (x64) の同一条件下における 500行 〜 50,000行（20万セル）の 4 言語実測データ、およびアーキテクチャ考察は、**[【技術実測レポート】Excelライブラリ 4系統 3OS総合負荷テスト＆アーキテクチャ考察](../benchmarks/BENCHMARK_REPORT_3OS.md)** をご覧ください。各 OS での `setOnlyMode` による高速化効果や OOM 挙動も網羅しています。
+
 ---
 
 ## 1. ライブラリ別 総合機能比較マトリクス
