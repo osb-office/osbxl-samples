@@ -56,8 +56,8 @@ To address these pain points, we conducted exhaustive benchmark stress tests com
 * In Java, osbxl bypasses Apache POI's massive schema class initialization overhead (~0.5s+), returning a file in **0.1 seconds**.  
   👉 *User latency drops to unnoticeable levels, completely removing HTTP gateway timeout risks.*
 
-#### ③ [Cloud Generational Leap] Latest GCP C4 Delivers 10%–30% Higher Throughput than C3
-* Comparing 4th Gen Xeon (C3: Sapphire Rapids) with 5th Gen Xeon (C4: Emerald Rapids) under identical 4-vCPU configurations, **C4 consistently outperforms C3 by 10% to 30%**.
+#### ③ [Cloud Generational Leap] Latest GCP C4 Delivers ~1.1x–1.5x Higher Throughput than C3
+* Comparing 4th Gen Xeon (C3: Sapphire Rapids) with 5th Gen Xeon (C4: Emerald Rapids) under identical 4-vCPU configurations, **C4 consistently outperforms C3 by approximately 1.1x to 1.5x**.
 * For a 10,000-row workbook, Node.js broke the 100ms barrier at **99ms (sub-0.1s)**, PHP clocked **0.101s**, and Java clocked **0.272s**, offering extraordinary scalability for microservices and high-concurrency environments.
 
 ---
@@ -105,20 +105,20 @@ Real-world benchmark data comparing 4th Gen Xeon (Sapphire Rapids / C3) and 5th 
 
 ### C3 vs C4 Measured Data Comparison (Unit: Seconds)
 
-| Language / Row Count | GCP C3 (Sapphire Rapids) | GCP C4 (Emerald Rapids) | C4 Improvement | Competing OSS (C4) |
+| Language / Row Count | GCP C3 (Sapphire Rapids) | GCP C4 (Emerald Rapids) | C4 Speedup | Competing OSS (C4) |
 | :--- | :---: | :---: | :---: | :---: |
-| **PHP 1,000 rows** | 0.014s | **0.011s** | **+21.4%** | 0.070s (6.56x) |
-| **PHP 10,000 rows** | 0.115s | **0.101s** | **+12.2%** | 0.753s (7.48x) |
-| **PHP 50,000 rows** | 0.789s | **0.696s** | **+11.8%** | ❌ OOM Crash |
-| **Python 1,000 rows** | 0.014s | **0.011s** | **+21.4%** | 0.033s (3.03x) |
-| **Python 10,000 rows** | 0.130s | **0.105s** | **+19.2%** | 0.310s (2.95x) |
-| **Python 50,000 rows** | 0.866s | **0.721s** | **+16.7%** | 1.594s (2.21x) |
-| **Node.js 1,000 rows** | 0.015s | **0.011s** | **+26.7%** | 0.037s (3.27x) |
-| **Node.js 10,000 rows** | 0.117s | **0.099s** | **+15.4%** | 0.230s (2.33x) |
-| **Node.js 50,000 rows** | 0.799s | **0.679s** | **+15.0%** | 0.952s (1.40x) |
-| **Java 1,000 rows** | 0.181s | **0.122s** | **+32.6%** | 0.653s (5.35x) |
-| **Java 10,000 rows** | 0.382s | **0.272s** | **+28.8%** | 1.142s (4.20x) |
-| **Java 50,000 rows** | 1.242s | **0.972s** | **+21.7%** | ❌ OOM Crash |
+| **PHP 1,000 rows** | 0.014s | **0.011s** | **1.27x faster** | 0.070s (6.56x) |
+| **PHP 10,000 rows** | 0.115s | **0.101s** | **1.14x faster** | 0.753s (7.48x) |
+| **PHP 50,000 rows** | 0.789s | **0.696s** | **1.13x faster** | ❌ OOM Crash |
+| **Python 1,000 rows** | 0.014s | **0.011s** | **1.27x faster** | 0.033s (3.03x) |
+| **Python 10,000 rows** | 0.130s | **0.105s** | **1.24x faster** | 0.310s (2.95x) |
+| **Python 50,000 rows** | 0.866s | **0.721s** | **1.20x faster** | 1.594s (2.21x) |
+| **Node.js 1,000 rows** | 0.015s | **0.011s** | **1.36x faster** | 0.037s (3.27x) |
+| **Node.js 10,000 rows** | 0.117s | **0.099s** | **1.18x faster** | 0.230s (2.33x) |
+| **Node.js 50,000 rows** | 0.799s | **0.679s** | **1.18x faster** | 0.952s (1.40x) |
+| **Java 1,000 rows** | 0.181s | **0.122s** | **1.48x faster** | 0.653s (5.35x) |
+| **Java 10,000 rows** | 0.382s | **0.272s** | **1.40x faster** | 1.142s (4.20x) |
+| **Java 50,000 rows** | 1.242s | **0.972s** | **1.28x faster** | ❌ OOM Crash |
 
 ---
 
@@ -385,7 +385,7 @@ In contrast, **osbxl embeds a comprehensive calculation engine (~500 Excel-compa
 | :--- | :--- | :--- |
 | **Web Report Downloads (100–1,000 rows)** | Slow startup / class load (POI takes 0.5s+), divergent APIs across languages | **Java is 4–6x faster, PHP is 12–14x faster**.<br>All languages return files in ~0.01s. |
 | **Monthly Batch / Full Exports (50,000 rows)** | Process killed by OOM (exceeding memory ceiling) | **PHP and Java finish safely in 0.7s–0.9s**.<br>No need to tune or inflate container memory. |
-| **Cloud Instance Sizing (C3 vs C4)** | Long batch windows, degraded concurrency | **Selecting GCP C4 unlocks a 10%–30% throughput boost across all languages**. |
+| **Cloud Instance Sizing (C3 vs C4)** | Long batch windows, degraded concurrency | **Selecting GCP C4 unlocks a ~1.1x–1.5x throughput boost across all languages**. |
 | **Polyglot & Microservice Architectures** | Distinct libraries and learning curves per language | **100% identical API across Java, Python, Node, PHP, and WebAssembly**. |
 
 ---
