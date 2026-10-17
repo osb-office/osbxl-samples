@@ -37,7 +37,7 @@ published: true
 | カテゴリ | 機能項目 | osbxl (5言語共通) | Apache POI (Java) | openpyxl (Python) | PhpSpreadsheet (PHP) | ExcelJS (Node.js) |
 |---|---|:---:|:---:|:---:|:---:|:---:|
 | **入出力・安定性** | .xlsx / .xlsm / .xltx の読み込み・保存 | **◎** | **◎** | **◎** | **◎** | **◎** |
-| | 大容量時の安定性 | **◎ (省メモリ完走)** | **△ (OOM 多発)** | **△ (行数比例で遅延)** | **✕ (128Mで即死)** | **◯ / △ (ヒープ圧迫)** |
+| | 大容量時の安定性 | **◎ (省メモリ完走)** | **△ (OOM 多発)** | **△ (行数比例で遅延)** | **✕ (128Mでクラッシュ)** | **◯ / △ (ヒープ圧迫)** |
 | **数式計算** | 数式書き込み | **◎** | **◎** | **◎** | **◎** | **◎** |
 | | **サーバーサイド数式評価**<br>(Excel非インストール環境での値計算) | **◎ 約500関数**<br>(XLOOKUP, VLOOKUP等) | **◯ 約300〜400関数**<br>(Evaluator搭載) | **✕ 非対応**<br>(開くまでセル値は None) | **△ 一部のみ**<br>(複雑関数未対応・極めて重い) | **✕ 非対応** |
 | | **構造化参照数式**<br>(例: `SUM(Table[列名])`) | **◎ ネイティブ即時計算** | **△ (計算不可・保存のみ)** | **✕ 評価不可** | **✕ 評価不可** | **✕ 評価不可** |
@@ -84,7 +84,7 @@ Java の Apache POI は巨大な XML Beans やスキーマ構造の初期化に�
 
 | 言語 / 環境 | ライブラリ | 処理時間 (秒) | メモリ消費 (MB) | 実測結果・限界の状況 |
 |---|---|:---:|:---:|---|
-| **PHP** (8.5 / 128M上限) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ❌ **クラッシュ (OOM)**<br>**5.836 秒** | ❌ **128MB上限超過**<br>**32.00 MB** | **PhpSpreadsheet は 128MB を超えて即死**。<br>`Fatal error: Allowed memory size exhausted`<br>**phposbxl はわずか 32MB で安全完走**（ファイルサイズ 1.93MB）。 |
+| **PHP** (8.5 / 128M上限) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ❌ **クラッシュ (OOM)**<br>**5.836 秒** | ❌ **128MB上限超過**<br>**32.00 MB** | **PhpSpreadsheet は 128MB を超えて異常終了**。<br>`Fatal error: Allowed memory size exhausted`<br>**phposbxl はわずか 32MB で安全完走**（ファイルサイズ 1.93MB）。 |
 | **Java** (JDK 1.8 / 256M上限) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ❌ **クラッシュ (OOM)**<br>**6.394 秒** | ❌ **256MBヒープ枯渇**<br>**36.19 MB** | **POI はヒープ枯渇でクラッシュ**。<br>`java.lang.OutOfMemoryError: Java heap space`<br>**osbxl は 36MB の軽量ヒープ・6.39秒で安全完走**。 |
 | **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.218 秒<br>**1.798 秒** | 772.11 MB<br>**1,836 MB**<br>*(V8ヒープ: 20.9MB)* | 同等の高速書き出しモードで **1.79 秒** を達成。<br>ExcelJS が V8 ヒープを大量消費するのに対し、**nodeosbxl の V8 ヒープ消費はわずか 20.9MB**。 |
 | **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.500 秒<br>**1.900 秒** | 377.93 MB<br>**1,445 MB**<br>*(Pythonヒープ: 28MB)* | openpyxl（2.50秒）を上回る **1.90 秒** を達成。<br>**Python 側のヒープ消費はわずか 28MB** に抑えられ安定。 |
@@ -130,7 +130,7 @@ ws.setRangeFormulas("D2", formulas) # 数式も 2次元配列で一括投入
 | シーン | 従来の課題 | osbxl による解決 |
 |---|---|---|
 | **日常のWeb帳票 (200行)** | 初期化遅延、ライブラリごとの作法の違い | **Java 約6.2倍、PHP 約3倍高速**。<br>全言語 0.01〜0.1秒台で即時レスポンス。 |
-| **大規模・バッチ (50,000行)** | メモリ上限超過（OOM）でプロセス即死 | **PHP 32MB、Java 36MB で安全完走**。<br>言語ヒープを枯渇させない堅牢性。 |
+| **大規模・バッチ (50,000行)** | メモリ上限超過（OOM）でプロセス強制終了 | **PHP 32MB、Java 36MB で安全完走**。<br>言語ヒープを枯渇させない堅牢性。 |
 | **サーバー側数式評価** | openpyxl や ExcelJS は計算不可（None）<br>既存 OSS は XLOOKUP や SPILL に非対応 | **約 500 関数の計算エンジン内蔵**。<br>XLOOKUP・SPILL（動的配列）・構造化参照を即座にネイティブ評価。 |
 | **マルチ言語開発** | 言語ごとに別々のライブラリ・別コード | **Java / Python / Node / PHP / WASM で 100% 同一 API**。 |
 

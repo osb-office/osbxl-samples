@@ -18,7 +18,7 @@ osbxl が備えるコア機能を基準に、各オープンソース・著名�
 | カテゴリ | 機能項目 | osbxl (5言語共通) | Apache POI (Java) | openpyxl (Python) | PhpSpreadsheet (PHP) | ExcelJS / SheetJS (JS) |
 |---|---|:---:|:---:|:---:|:---:|:---:|
 | **基本入出力** | .xlsx の読み込み・保存 | **◎** | **◎** | **◎** | **◎** | **◎** |
-| | 大容量時の安定性 | **◎** (メモリ不変) | **△** (XSSFはOOM、SXSSFは制約大) | **△** (行数比例で遅延) | **✕** (128Mで即死多発) | **◯ / △** (V8メモリ枠依存) |
+| | 大容量時の安定性 | **◎** (メモリ不変) | **△** (XSSFはOOM、SXSSFは制約大) | **△** (行数比例で遅延) | **✕** (128Mでクラッシュ多発) | **◯ / △** (V8メモリ枠依存) |
 | **数式計算** | 数式の書き込み (`setFormula`) | **◎** | **◎** | **◎** | **◎** | **◎** |
 | | **サーバーサイド数式評価**<br>(Excel非インストール環境での値計算) | **◎ 約500関数**<br>(XLOOKUP, VLOOKUP等) | **◯ 約300〜400関数**<br>(Evaluator搭載) | **✕ 非対応**<br>(Excel本体で開くまでNone) | **△ 一部のみ**<br>(複雑関数は未対応・極めて重い) | **✕ 原則非対応**<br>(SheetJS Pro等の有償版のみ) |
 | **テーブル機能** | テーブル作成 (`ListObject`) | **◎** | **◯** (CTTable低レイヤ) | **◯** (Tableクラス) | **◯** (Tableクラス) | **◯** (addTable) |
@@ -60,8 +60,8 @@ osbxl が備えるコア機能を基準に、各オープンソース・著名�
 
 | 言語 / 環境 | ライブラリ | 処理時間 (秒) | メモリ消費 (MB) | 実測結果・限界検証 |
 |---|---|:---:|:---:|---|
-| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**5.836 秒** | ✕ 128MB上限超過 (OOM)<br>**32.00 MB** | **PhpSpreadsheet はメモリ上限超過で即死**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 32MB で安全完走**（ファイルサイズ 1.93MB）。 |
-| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**6.394 秒** | ✕ 256MBヒープ枯渇 (OOM)<br>**36.19 MB** | **POI はヒープ枯渇で即死**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 36MB の軽量ヒープ・6.39秒で完走**（SXSSFのような機能制限書き換え不要）。 |
+| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ クラッシュ<br>**5.836 秒** | ✕ 128MB上限突破 (OOM)<br>**32.00 MB** | **PhpSpreadsheet はメモリ上限超過で異常終了**（`Fatal error: Allowed memory size exhausted`）。<br>**phposbxl はわずか 32MB で安全完走**（ファイルサイズ 1.93MB）。 |
+| **Java** (JDK 1.8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ クラッシュ<br>**6.394 秒** | ✕ 256MBヒープ枯渇 (OOM)<br>**36.19 MB** | **POI はヒープ枯渇でクラッシュ**（`OutOfMemoryError: Java heap space`）。<br>**osbxl は 36MB の軽量ヒープ・6.39秒で完走**（SXSSFのような機能制限書き換え不要）。 |
 | **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 1.218 秒<br>**1.798 秒** | 772.11 MB<br>**1,836 MB**<br>*(V8ヒープ: 20.9MB)* | 同等の書き出し条件（setOnlyMode）で**1.79秒台を達成**。<br>ExcelJSがV8ヒープを大量消費するのに対し、**nodeosbxlのV8ヒープ消費はわずか20.9MBで安全**。 |
 | **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 2.500 秒<br>**1.900 秒** | 377.93 MB<br>**1,445 MB**<br>*(Pythonヒープ: 28MB)* | 同等の書き出し条件（setOnlyMode）で**openpyxl（2.500秒）を上回る1.900秒を達成**。<br>Pythonヒープ消費はわずか28MB。 |
 
@@ -78,7 +78,7 @@ osbxl が備えるコア機能を基準に、各オープンソース・著名�
 
 - **PhpSpreadsheet (PHP 8.5)**:
   `Fatal error: Allowed memory size of 134217728 bytes exhausted`
-  &rarr; 128MB の PHP メモリ上限を突破し、StringTable 生成中にクラッシュ（即死）。
+  &rarr; 128MB の PHP メモリ上限を突破し、StringTable 生成中にクラッシュ（プロセス強制終了）。
 - **Apache POI (Java JDK 1.8)**:
   `java.lang.OutOfMemoryError: Java heap space`
   &rarr; 256MB の最大ヒープ環境下で、50,000行のオブジェクトグラフ展開中にメモリ枯渇でクラッシュ。SXSSF への書換には多くの機能制限が伴います。
