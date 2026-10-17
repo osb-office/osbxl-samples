@@ -13,6 +13,8 @@ Official verified code samples and patterns for **[osbxl (https://osb-office.com
 
 ## 📊 Comparison with Popular Excel Libraries
 
+> 📈 **[New! Multi-Platform Benchmark Report (v1.5.1)](benchmarks/BENCHMARK_REPORT_3OS.en.md)**: Real-world stress testing across GCP C3/C4, macOS M4, and Windows. See how osbxl completes 50,000 rows in ~0.7s where Apache POI and PhpSpreadsheet crash with OOM.
+> 
 > **For in-depth analysis and migration tips, check out our [Online Library Comparison Guide](https://osb-office.com/en/pages/comparison.php).**
 
 Pure high-level libraries (Apache POI, openpyxl, PhpSpreadsheet) often suffer from **Out of Memory errors, GC pauses, and absent formula calculation engines** on large datasets. osbxl’s optimized C++ core eliminates these bottlenecks:

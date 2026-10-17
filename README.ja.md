@@ -14,6 +14,8 @@ osbxl は、AI によるコード自動生成に対応した、C++ 製コアに�
 
 ## 📊 主要Excelライブラリとの違い・性能比較
 
+> 📈 **[最新！マルチプラットフォーム総合実測負荷テスト レポート (v1.5.1)](benchmarks/BENCHMARK_REPORT_3OS.md)**: クラウド（GCP C3/C4）・macOS（Apple M4）・Windows における徹底検証。従来のライブラリが OOM で落ちる 50,000行を osbxl が 0.6〜0.9秒で安全完走する詳細データを公開中。
+> 
 > **詳細な比較表・移行ガイドは [公式サイトのライブラリ比較ページ](https://osb-office.com/pages/comparison.php) をご覧ください。**
 
 従来の高級言語ライブラリ（Apache POI、openpyxl、PhpSpreadsheet 等）で大量データを扱う際の**「メモリ不足（Memory Exhausted）」「GC による速度低下」「計算エンジンの不在」**を、C++ ネイティブコアにより根本から解決します。

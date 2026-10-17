@@ -2,6 +2,10 @@
 
 # osbxl サンプル集
 
+> クラウド（GCP C3/C4）・macOS（Apple M4）・Windows における 4言語（PHP / Python / Node.js / Java）の性能限界と、既存 OSS（Apache POI / openpyxl / PhpSpreadsheet / ExcelJS）との徹底比較・アーキテクチャ考察を公開しました。  
+> 
+> 👉 **[【技術実測レポート】マルチプラットフォーム総合負荷テスト＆アーキテクチャ考察を読む](../benchmarks/BENCHMARK_REPORT_3OS.md)**
+
 実行して確認済みの osbxl サンプルです。各ページのコードはそのまま動きます。 コードは **Node.js / Python / Java / PHP / WebAssembly の5言語タブ**で切り替えられ、 タブごとに表示されるインストール手順も言語別です。
 
 **はじめての方は [general-01 概要 — オブジェクトモデルと基本の流れ](general-01-overview.md) から。**

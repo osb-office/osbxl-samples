@@ -2,6 +2,10 @@
 
 # osbxl Sample Collection
 
+> Comprehensive benchmark comparison and architectural analysis evaluating the performance limits of 4 languages (PHP / Python / Node.js / Java) against existing OSS (Apache POI / openpyxl / PhpSpreadsheet / ExcelJS) across Cloud (GCP C3/C4), macOS (Apple M4), Windows & Linux.  
+> 
+> 👉 **[Read the Full Technical Benchmark Report](../benchmarks/BENCHMARK_REPORT_3OS.en.md)**
+
 These osbxl samples have all been executed and verified. The code on each page runs as-is. Every code block switches between **five language tabs — Node.js / Python / Java / PHP / WebAssembly** — and the install instructions shown per tab are language-specific too.
 
 **If you are new here, start with [general-01 Overview — object model and basic flow](general-01-overview.md).**
@@ -28,7 +32,7 @@ These osbxl samples have all been executed and verified. The code on each page r
 | Create charts (column, line) | [general-10 Charts](general-10-charts.md) |
 | Aggregate with pivot tables | [general-11 Pivot tables](general-11-pivottables.md) |
 | Detailed Feature Comparison & Benchmarks vs POI / openpyxl / PHP | [Benchmark Comparison Report](benchmark-comparison.md) |
-| Linux / macOS (M4) / Windows 3-OS Stress Benchmark (500 to 50k rows) | [3-OS Benchmark & Architecture Report](../benchmarks/BENCHMARK_REPORT_3OS.md) |
+| Linux / macOS (M4) / Windows 3-OS Stress Benchmark (500 to 50k rows) | [3-OS Benchmark & Architecture Report](../benchmarks/BENCHMARK_REPORT_3OS.en.md) |
 
 ## general — overview and basic operations
 
