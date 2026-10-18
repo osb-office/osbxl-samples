@@ -1,6 +1,7 @@
 # osbxl サンプル集 (osbxl-samples)
 
-[English README is available here](README.md)
+> **最終更新日: 2026年10月18日**（osbxl `v1.5.1` 最新実測値反映）  
+> [English README is available here](README.md)
 
 **[osbxl 公式サイト (https://osb-office.com)](https://osb-office.com/)** の公式サンプルコード・パターン集です。  
 osbxl は、AI によるコード自動生成に対応した、C++ 製コアによる超高速マルチプラットフォーム・スプレッドシート計算＆Excel 生成エンジンです。

@@ -1,5 +1,6 @@
 # osbxl-samples
 
+> **Last Updated: October 18, 2026** (Reflecting latest osbxl `v1.5.1` benchmark measurements)  
 > **[🇯🇵 日本語版の README はこちら (README.ja.md)](README.ja.md)**
 
 Official verified code samples and patterns for **[osbxl (https://osb-office.com)](https://osb-office.com/)** — an AI-ready, ultra-fast C++ core multi-platform spreadsheet calculation and Excel generation engine.
