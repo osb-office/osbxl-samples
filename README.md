@@ -98,7 +98,18 @@ Measured under representative production and development environments generating
 | **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.011 s<br>**0.008 s** | 0.005 s<br>**0.004 s** | 104 MB<br>**18.0 MB (V8)** | **Finishes in blazing fast 4–8 ms**.<br>Never blocks the event loop with minimal V8 heap. |
 | **Java** (JDK 24/8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.542 s<br>**0.110 s** | 0.311 s<br>**0.057 s** | 15.1 MB<br>**16.9 MB** | **~4.9x–5.5x faster**.<br>Eliminates heavy XML schema init overhead. |
 
-### 3. Large-Scale 50,000-Row (200,000 Cells) Stress Test
+### 3. Mid-Scale 10,000-Row (40,000-Cell) Benchmark
+
+Benchmark results for standard business reporting (such as monthly logs, ledger exports) generating **10,000 rows × 4 columns = 40,000 cells + SUM formula**. osbxl completes in mere tens of milliseconds.
+
+| Language | Target Library | GCP C4 (Linux) | macOS (Apple M4) | Speedup Factor | Highlights |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.760 s<br>**0.055 s** | 0.862 s<br>**0.037 s** | **13.9x–23.4x faster** | While PhpSpreadsheet takes nearly a second, phposbxl returns in just 37–55 ms. |
+| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 0.324 s<br>**0.058 s** | 0.166 s<br>**0.030 s** | **~5.5x faster** | 10k rows completed in 30–58 ms, drastically cutting batch wait times. |
+| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.239 s<br>**0.056 s** | 0.109 s<br>**0.028 s** | **3.9x–4.3x faster** | Down to 28 ms; preserves event loop responsiveness even under high traffic. |
+| **Java** (JDK 24/8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 1.335 s<br>**0.208 s** | 0.620 s<br>**0.098 s** | **6.3x–6.4x faster** | While POI takes 0.6s–1.3s, osbxl completes smoothly in ~0.1s–0.2s. |
+
+### 4. Large-Scale 50,000-Row (200,000 Cells) Stress Test
 
 Stress test results scaling data up to **50,000 rows × 4 columns = 200,000 cells + SUM formula**. While popular open-source libraries crash from out-of-memory errors, osbxl completes cleanly across all platforms in 0.1s–0.5s.
 
