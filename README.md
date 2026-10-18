@@ -89,36 +89,36 @@ A side-by-side comparison of advanced features (formula engine, PivotTables, cha
 
 ### 2. Standard 200-Row (800-Cell) Benchmark
 
-Measured under representative production and development environments generating a standard business report (**200 rows × 4 columns = 800 cells + SUM formula**).
+Benchmark results generating a standard business report (**200 rows × 4 columns = 800 cells + SUM formula**).
 
-| Language | Target Library | GCP C4 (Linux) | macOS (Apple M4) | Memory (MB) | Highlights |
-| :--- | :--- | :---: | :---: | :---: | :--- |
-| **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.017 s<br>**0.007 s** | 0.018 s<br>**0.005 s** | 26.0 MB<br>**2.0 MB** | **~2.4x–3.5x faster & 13x less memory**.<br>Web API response finishes in milliseconds. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 0.011 s<br>**0.007 s** | 0.005 s<br>**0.003 s** | 53.2 MB<br>**12.0 MB (Py)** | **~1.7x faster (down to 3–7 ms)**.<br>Python heap usage is kept down to just 12 MB. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.011 s<br>**0.008 s** | 0.005 s<br>**0.004 s** | 104 MB<br>**18.0 MB (V8)** | **Finishes in blazing fast 4–8 ms**.<br>Never blocks the event loop with minimal V8 heap. |
-| **Java** (JDK 24/8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 0.542 s<br>**0.110 s** | 0.311 s<br>**0.057 s** | 15.1 MB<br>**16.9 MB** | **~4.9x–5.5x faster**.<br>Eliminates heavy XML schema init overhead. |
+| Language | Comparison | GCP C4: Rival OSS | GCP C4: **osbxl** | macOS: Rival OSS | macOS: **osbxl** | Speedup Factor |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **PHP** (8.5) | PhpSpreadsheet vs **phposbxl** | 0.017 s | **0.007 s** | 0.018 s | **0.005 s** | **2.4x–3.5x faster** |
+| **Python** (3.14) | openpyxl vs **pyosbxl** (`setOnlyMode`) | 0.011 s | **0.007 s** | 0.005 s | **0.003 s** | **~1.7x faster** |
+| **Node.js** (v24) | ExcelJS vs **nodeosbxl** (`setOnlyMode`) | 0.011 s | **0.008 s** | 0.005 s | **0.004 s** | **1.3x–1.5x faster** |
+| **Java** (JDK 24/8) | Apache POI vs **osbxl (Java)** | 0.542 s | **0.110 s** | 0.311 s | **0.057 s** | **4.9x–5.5x faster** |
 
 ### 3. Mid-Scale 10,000-Row (40,000-Cell) Benchmark
 
-Benchmark results for standard business reporting (such as monthly logs, ledger exports) generating **10,000 rows × 4 columns = 40,000 cells + SUM formula**. osbxl completes in mere tens of milliseconds.
+Benchmark results for standard business reporting (such as monthly logs, ledger exports) generating **10,000 rows × 4 columns = 40,000 cells + SUM formula**.
 
-| Language | Target Library | GCP C4 (Linux) | macOS (Apple M4) | Speedup Factor | Highlights |
-| :--- | :--- | :---: | :---: | :---: | :--- |
-| **PHP** (8.5) | PhpSpreadsheet 5.10.0<br>**phposbxl** | 0.760 s<br>**0.055 s** | 0.862 s<br>**0.037 s** | **13.9x–23.4x faster** | While PhpSpreadsheet takes nearly a second, phposbxl returns in just 37–55 ms. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 0.324 s<br>**0.058 s** | 0.166 s<br>**0.030 s** | **~5.5x faster** | 10k rows completed in 30–58 ms, drastically cutting batch wait times. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.239 s<br>**0.056 s** | 0.109 s<br>**0.028 s** | **3.9x–4.3x faster** | Down to 28 ms; preserves event loop responsiveness even under high traffic. |
-| **Java** (JDK 24/8) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | 1.335 s<br>**0.208 s** | 0.620 s<br>**0.098 s** | **6.3x–6.4x faster** | While POI takes 0.6s–1.3s, osbxl completes smoothly in ~0.1s–0.2s. |
+| Language | Comparison | GCP C4: Rival OSS | GCP C4: **osbxl** | macOS: Rival OSS | macOS: **osbxl** | Speedup Factor |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **PHP** (8.5) | PhpSpreadsheet vs **phposbxl** | 0.760 s | **0.055 s** | 0.862 s | **0.037 s** | **13.9x–23.4x faster** |
+| **Python** (3.14) | openpyxl vs **pyosbxl** (`setOnlyMode`) | 0.324 s | **0.058 s** | 0.166 s | **0.030 s** | **5.5x faster** |
+| **Node.js** (v24) | ExcelJS vs **nodeosbxl** (`setOnlyMode`) | 0.239 s | **0.056 s** | 0.109 s | **0.028 s** | **3.9x–4.3x faster** |
+| **Java** (JDK 24/8) | Apache POI vs **osbxl (Java)** | 1.335 s | **0.208 s** | 0.620 s | **0.098 s** | **6.3x–6.4x faster** |
 
 ### 4. Large-Scale 50,000-Row (200,000 Cells) Stress Test
 
 Stress test results scaling data up to **50,000 rows × 4 columns = 200,000 cells + SUM formula**. While popular open-source libraries crash from out-of-memory errors, osbxl completes cleanly across all platforms in 0.1s–0.5s.
 
-| Runtime / Limits | Target Library | GCP C4 (Linux) | macOS (Apple M4) | Memory Usage | Highlights & Fault Analysis |
-| :--- | :--- | :---: | :---: | :---: | :--- |
-| **PHP** (8.5 / 128M) | PhpSpreadsheet 5.10.0<br>**phposbxl** | ✕ OOM Crash<br>**0.346 s** | ✕ OOM Crash<br>**0.189 s** | ✕ >128MB limit<br>**32.0 MB** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>**phposbxl runs safely in 0.1s–0.3s using only 32 MB**. |
-| **Python** (3.14) | openpyxl 3.1.5<br>**pyosbxl** (`setOnlyMode`) | 1.662 s<br>**0.378 s** | 0.850 s<br>**0.183 s** | 378 MB<br>**28.0 MB (Py)** | **4.39x faster on C4, 4.64x faster on M4**.<br>Python heap is only 28 MB with zero risk of OOM. |
-| **Node.js** (v24) | ExcelJS 4.4.0<br>**nodeosbxl** (`setOnlyMode`) | 0.979 s<br>**0.329 s** | 0.502 s<br>**0.133 s** | 772 MB<br>**20.9 MB (V8)** | **2.97x faster on C4, 3.77x faster on M4**.<br>V8 heap capped at 20.9 MB, ideal for concurrent services. |
-| **Java** (JDK 24/8 / 256M) | Apache POI 5.2.5 (XSSF)<br>**osbxl (Java)** | ✕ OOM Crash<br>**0.553 s** | ✕ OOM Crash<br>**0.247 s** | ✕ >256MB heap<br>**36.2 MB** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>**osbxl finishes cleanly in 0.2s–0.5s within 36.2 MB heap**. |
+| Runtime / Limits | Comparison | GCP C4: Rival OSS | GCP C4: **osbxl** | macOS: Rival OSS | macOS: **osbxl** | Highlights & Fault Analysis |
+| :--- | :--- | :---: | :---: | :---: | :---: | :--- |
+| **PHP** (8.5 / 128M) | PhpSpreadsheet vs **phposbxl** | ❌ OOM Crash | **0.346 s** | ❌ OOM Crash | **0.189 s** | **PhpSpreadsheet crashes fatally** (`Allowed memory size exhausted`).<br>phposbxl runs safely in 0.1s–0.3s using only 32 MB. |
+| **Python** (3.14) | openpyxl vs **pyosbxl** (`setOnlyMode`) | 1.662 s | **0.378 s** | 0.850 s | **0.183 s** | **4.39x faster on C4, 4.64x faster on M4**.<br>Python heap is only 28 MB with zero risk of OOM. |
+| **Node.js** (v24) | ExcelJS vs **nodeosbxl** (`setOnlyMode`) | 0.979 s | **0.329 s** | 0.502 s | **0.133 s** | **2.97x faster on C4, 3.77x faster on M4**.<br>V8 heap capped at 20.9 MB, ideal for concurrent services. |
+| **Java** (JDK 24/8 / 256M) | Apache POI vs **osbxl (Java)** | ❌ OOM Crash | **0.553 s** | ❌ OOM Crash | **0.247 s** | **POI crashes fatally** (`OutOfMemoryError: Java heap space`).<br>osbxl finishes cleanly in 0.2s–0.5s within 36.2 MB heap. |
 
 > 💡 **Memory Structure & Language Heap Safety**:  
 > ExcelJS and openpyxl keep every cell, row, and style as language-level objects in the runtime heap, rapidly consuming Node.js and Python heap limits (ExcelJS >420 MB, openpyxl >370 MB).<br>
