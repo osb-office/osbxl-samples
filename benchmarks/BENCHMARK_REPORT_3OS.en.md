@@ -68,10 +68,10 @@ To address these pain points, we conducted exhaustive benchmark stress tests com
 
 | Language / Library | macOS (Apple M4) | GCP C4 (Xeon 8581C) | GCP C3 (Xeon 8481C) | Windows 11 (x64) | Existing OSS Library Behavior |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **PHP (phposbxl)** | **1.085 s** | **0.346 s** | **0.405 s** | **1.011 s** | ❌ **Fatal OOM Crash on all platforms** |
-| **Python (pyosbxl)** | **0.621 s** | **0.378 s** | **0.479 s** | **0.996 s** | openpyxl: 1.66s–2.52s (No formula evaluation) |
-| **Node.js (nodeosbxl)** | **0.575 s** | **0.329 s** | **0.399 s** | **0.987 s** | ExcelJS: 0.97s–1.32s (No formula engine) |
-| **Java (osbxl Java)** | **1.946 s** | **0.553 s** | **0.738 s** | **1.410 s** | ❌ **Fatal OOM Crash (Heap exhaustion)** |
+| **PHP (phposbxl)** | **0.189 s** | **0.346 s** | **0.405 s** | **1.011 s** | ❌ **Fatal OOM Crash on all platforms** |
+| **Python (pyosbxl)** | **0.183 s** | **0.378 s** | **0.479 s** | **0.996 s** | openpyxl: 0.85s–2.52s (No formula evaluation) |
+| **Node.js (nodeosbxl)** | **0.133 s** | **0.329 s** | **0.399 s** | **0.987 s** | ExcelJS: 0.50s–1.32s (No formula engine) |
+| **Java (osbxl Java)** | **0.247 s** | **0.553 s** | **0.738 s** | **1.410 s** | ❌ **Fatal OOM Crash (Heap exhaustion)** |
 
 > *Note: For pure write throughput comparison, osbxl was tested with `setOnlyMode = True`. Existing OSS libraries either lack built-in formula evaluation engines or crash with OOM.*
 
@@ -289,37 +289,49 @@ Rows      | Apache POI (A)          | osbxl (True) (B)        | osbxl (False) (C
 
 ```text
 ========================================================================================================
-Execution Date : 2026-10-12
+Execution Date : 2026-10-18 15:36:12
 Machine        : macOS Darwin arm64 (Apple M4 mini / 10 cores: 4P+6E)
+Node.js        : v24.21.0
+Python         : Python 3.14.7
+PHP            : PHP 8.5.11 (cli) (built: Oct 12 2026 20:52:28) (NTS)
+Java           : openjdk version "1.8.0_504"
 ========================================================================================================
 
-[1] PHP Family (PhpSpreadsheet vs phposbxl)
-   500 r  | 0.068s                  |  0.015s                 |  0.025s                 |   4.51x   |   2.72x
-  1000 r  | 0.084s                  |  0.021s                 |  0.041s                 |   4.02x   |   2.05x
-  5000 r  | 0.421s                  |  0.094s                 |  0.215s                 |   4.48x   |   1.96x
- 10000 r  | 0.862s                  |  0.191s                 |  0.425s                 |   4.50x   |   2.03x
- 50000 r  | ❌ OOM (Memory Exceeded)|  1.085s                 |  2.327s                 | Survived  | Survived
+[1] PHP Family: PhpSpreadsheet vs phposbxl
+Rows      | PhpSpreadsheet (A)      | phposbxl (True) (B)     | phposbxl (False) (C)    | (A)/(B)   | (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 r  | 0.055s ( 18.7KB)        |  0.008s ( 20.9KB)      |  0.008s ( 21.1KB)      |   6.61x   |   6.52x
+  1000 r  | 0.080s ( 31.0KB)        |  0.007s ( 35.2KB)      |  0.009s ( 35.4KB)      |  11.52x   |   8.53x
+  5000 r  | 0.424s (134.1KB)        |  0.020s (152.9KB)      |  0.032s (153.3KB)      |  21.39x   |  13.36x
+ 10000 r  | 0.862s (262.6KB)        |  0.037s (300.0KB)      |  0.062s (300.9KB)      |  23.43x   |  14.00x
+ 50000 r  | OOM (Memory Exceeded)   |  0.189s (1481.6KB)     |  0.335s (1496.2KB)     | Survived  | Survived
 
-[2] Python Family (openpyxl vs pyosbxl)
-   500 r  | 0.010s                  |  0.009s                 |  0.023s                 |   1.15x   |   0.43x
-  1000 r  | 0.018s                  |  0.015s                 |  0.044s                 |   1.19x   |   0.41x
-  5000 r  | 0.082s                  |  0.065s                 |  0.207s                 |   1.27x   |   0.40x
- 10000 r  | 0.169s                  |  0.126s                 |  0.420s                 |   1.34x   |   0.40x
- 50000 r  | 0.862s                  |  0.621s                 |  2.115s                 |   1.39x   |   0.41x
+[2] Python Family: openpyxl vs pyosbxl
+Rows      | openpyxl (A)            | pyosbxl (True) (B)      | pyosbxl (False) (C)     | (A)/(B)   | (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 r  | 0.011s (  16.3KB)       | 0.006s (  20.9KB)       | 0.006s (  21.1KB)       |   1.76x   |   1.73x
+  1000 r  | 0.019s (  28.0KB)       | 0.005s (  35.2KB)       | 0.007s (  35.4KB)       |   4.07x   |   2.84x
+  5000 r  | 0.085s ( 119.5KB)       | 0.016s ( 152.9KB)       | 0.028s ( 153.3KB)       |   5.39x   |   3.07x
+ 10000 r  | 0.166s ( 233.7KB)       | 0.030s ( 300.0KB)       | 0.054s ( 300.9KB)       |   5.50x   |   3.07x
+ 50000 r  | 0.850s (1133.0KB)       | 0.183s (1481.6KB)       | 0.292s (1496.2KB)       |   4.64x   |   2.91x
 
-[3] Node.js Family (ExcelJS vs nodeosbxl)
-   500 r  | 0.010s                  |  0.008s                 |  0.022s                 |   1.21x   |   0.45x
-  1000 r  | 0.014s                  |  0.013s                 |  0.038s                 |   1.07x   |   0.37x
-  5000 r  | 0.048s                  |  0.059s                 |  0.187s                 |   0.81x   |   0.26x
- 10000 r  | 0.098s                  |  0.116s                 |  0.380s                 |   0.84x   |   0.26x
- 50000 r  | 0.478s                  |  0.575s                 |  1.838s                 |   0.83x   |   0.26x
+[3] Node.js Family: ExcelJS vs nodeosbxl
+Rows      | ExcelJS (A)             | nodeosbxl (True) (B)    | nodeosbxl (False) (C)   | (A)/(B)   | (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 r  | 0.024s (  19.1KB)       | 0.005s (  20.9KB)       | 0.006s (  21.1KB)       |   4.92x   |   4.01x
+  1000 r  | 0.016s (  31.9KB)       | 0.005s (  35.2KB)       | 0.007s (  35.4KB)       |   3.40x   |   2.36x
+  5000 r  | 0.058s ( 134.7KB)       | 0.014s ( 152.9KB)       | 0.025s ( 153.3KB)       |   4.11x   |   2.30x
+ 10000 r  | 0.109s ( 263.0KB)       | 0.028s ( 300.0KB)       | 0.051s ( 300.9KB)       |   3.92x   |   2.12x
+ 50000 r  | 0.502s (1299.6KB)       | 0.133s (1481.6KB)       | 0.265s (1496.2KB)       |   3.77x   |   1.89x
 
-[4] Java Family (Apache POI vs osbxl)
-   500 r  | 0.334s                  |  0.069s                 |  0.076s                 |   4.84x   |   4.39x
-  1000 r  | 0.370s                  |  0.086s                 |  0.098s                 |   4.30x   |   3.78x
-  5000 r  | 0.589s                  |  0.239s                 |  0.316s                 |   2.46x   |   1.86x
- 10000 r  | 0.778s                  |  0.428s                 |  0.587s                 |   1.82x   |   1.33x
- 50000 r  | ❌ OOM (Heap Exhausted) |  1.946s                 |  2.671s                 | Survived  | Survived
+[4] Java Family: Apache POI (XSSF) vs osbxl(Java)
+Rows      | Apache POI (A)          | osbxl (True) (B)        | osbxl (False) (C)       | (A)/(B)   | (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 r  | 0.341s (  16.2KB)       | 0.059s (  20.9KB)       | 0.061s (  21.1KB)       |   5.78x   |   5.59x
+  1000 r  | 0.376s (  29.1KB)       | 0.062s (  35.2KB)       | 0.065s (  35.4KB)       |   6.06x   |   5.78x
+  5000 r  | 0.487s ( 131.4KB)       | 0.079s ( 152.9KB)       | 0.093s ( 153.3KB)       |   6.16x   |   5.24x
+ 10000 r  | 0.620s ( 259.8KB)       | 0.098s ( 300.0KB)       | 0.131s ( 300.9KB)       |   6.33x   |   4.73x
+ 50000 r  | OOM (Heap Exhausted)    | 0.247s (1481.6KB)       | 0.412s (1496.2KB)       | Survived  | Survived
 ```
 
 ---
