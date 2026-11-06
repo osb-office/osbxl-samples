@@ -2,9 +2,9 @@
 
 # osbxl サンプル集
 
-> クラウド（GCP C3/C4）・macOS（Apple M4）・Windows における 4言語（PHP / Python / Node.js / Java）の性能限界と、既存 OSS（Apache POI / openpyxl / PhpSpreadsheet / ExcelJS）との徹底比較・アーキテクチャ考察を公開しました。  
+> クラウド（GCP C3/C4）・macOS（Apple M4）における 4言語（PHP / Python / Node.js / Java）の性能限界と、既存 OSS（Apache POI / openpyxl / PhpSpreadsheet / ExcelJS）との徹底比較・アーキテクチャ考察を公開しました。  
 > 
-> 👉 **[【技術実測レポート】マルチプラットフォーム総合負荷テスト＆アーキテクチャ考察を読む](../benchmarks/BENCHMARK_REPORT_3OS.md)**
+> 👉 **[【技術実測レポート】マルチプラットフォーム総合負荷テスト＆アーキテクチャ考察を読む](../benchmarks/BENCHMARK_REPORT_LINUX_MAC.md)**
 
 実行して確認済みの osbxl サンプルです。各ページのコードはそのまま動きます。 コードは **Node.js / Python / Java / PHP / WebAssembly の5言語タブ**で切り替えられ、 タブごとに表示されるインストール手順も言語別です。
 
@@ -32,7 +32,7 @@
 | グラフ（縦棒・折れ線）を作成したい | [general-10 チャート](general-10-charts.md) |
 | ピボットテーブルで集計したい | [general-11 ピボットテーブル](general-11-pivottables.md) |
 | 他ライブラリ（POI/openpyxl/PHP）との詳細機能対比・ベンチマーク | [ベンチマーク比較実測レポート](benchmark-comparison.md) |
-| Linux / macOS (M4) / Windows 3OS実測負荷テスト（500〜50,000行） | [3OS総合負荷テスト実測レポート](../benchmarks/BENCHMARK_REPORT_3OS.md) |
+| Linux / macOS (M4) 実測負荷テスト（500〜50,000行） | [Linux・macOS 総合負荷テスト実測レポート](../benchmarks/BENCHMARK_REPORT_LINUX_MAC.md) |
 
 ## general — 概要・基本操作
 
