@@ -1,10 +1,13 @@
 # 大量データの一括高速投入 — setRangeData / setRangeFormulas
 
-level: intermediate ／ verified: 2026-10-11 ／ 5言語タブ対応 ／ [English](../en/general-06-bulk-input.md)
+level: intermediate ／ verified: 2026-10-17 ／ 5言語タブ対応 ／ [English](../en/general-06-bulk-input.md)
+
 
 ## やりたいこと
 
+
 何千・何万セルもの値や数式を、セルごとに `getCells()` するのではなく **2次元配列にまとめて一度に高速投入する**。CSV やデータベースの検索結果などの行列表を、最速かつ最小のメモリでワークシートに一括反映します。
+
 
 | やり方 | 使うもの | 特徴 |
 | --- | --- | --- |
@@ -12,18 +15,24 @@ level: intermediate ／ verified: 2026-10-11 ／ 5言語タブ対応 ／ [Englis
 | **2次元配列で値投入（最高速・推奨）** | `ws.setRangeData(startA1, data)` | **最速・推奨。** 行列データを素の配列で一括転送。数値文字列は自動的に数値セルとして保存。 |
 | **2次元配列で数式投入（最高速・推奨）** | `ws.setRangeFormulas(startA1, formulas)` | **最速・推奨。** 計算列の数式群を 2次元配列で一度に流し込む（先頭の "=" は不要）。 |
 
+
 ## 対象クラス
 
+
 ### `WorkSheet`
+
 
 | メソッド | 説明 |
 | --- | --- |
 | `setRangeData(startA1, data)` | 左上開始セル（例: "A1"）から、2次元配列（各行・各列の文字列）の値を一括高速入力します。 |
-| `setRangeFormulas(startA1, formulas)` | 左上開始セル（例: "C1"）から、2次元配列（各行・各列の数式文字列、"="不要）を一括高速入力します。 |
+| `setRangeFormulas(startA1, formulas)` | 左上開始セル（例: "D2"）から、2次元配列（各行・各列の数式文字列、"="不要）を一括高速入力します。 |
+
 
 ## コード
 
+
 実行結果:
+
 
 #### [Node.js]
 
@@ -39,7 +48,7 @@ const ws = wb.openWorkSheet("Sheet1");
 // 各行・各列の値を文字列の2次元配列として用意し、左上セルを指定して一度に流し込みます。
 // 数値形式の文字列 ("100" 等) は自動的に数値セルとして正しく認識・保存されます。
 const data = [
-    ["商品名", "単価", "数量"],
+    ["商品名", "単価", "数量", "金額"],
     ["りんご", "100", "3"],
     ["みかん", "50", "6"],
     ["ぶどう", "150", "2"],
@@ -47,19 +56,19 @@ const data = [
 ws.setRangeData("A1", data);
 
 console.log("[1] setRangeData 投入後:");
-for (const a1 of ["A1", "B2", "C2"]) {
+for (const a1 of ["A1", "B2", "C2", "D1"]) {
     console.log(`    ${a1} = ${JSON.stringify(ws.getRange(a1).getValue()[a1])}`);
 }
 
 // ---------- 2. 2次元配列による数式の一括高速投入 (setRangeFormulas) ----------
 // 計算列の数式群を2次元配列で一度に流し込みます（先頭の "=" は不要）。
+// ヘッダー行（D1）を除いた D2 セルから数式を展開します。
 const formulas = [
-    ["金額"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ];
-ws.setRangeFormulas("D1", formulas);
+ws.setRangeFormulas("D2", formulas);
 
 console.log("[2] setRangeFormulas 投入後:");
 console.log("    数式 D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getFormula()));
@@ -102,6 +111,7 @@ wb.save();
 wb.close();
 ```
 
+
 #### [Python]
 
 ```python
@@ -116,7 +126,7 @@ ws = wb.openWorkSheet("Sheet1")
 
 # ---------- 1. 2次元配列による値の一括高速投入 (setRangeData) ----------
 data = [
-    ["商品名", "単価", "数量"],
+    ["商品名", "単価", "数量", "金額"],
     ["りんご", "100", "3"],
     ["みかん", "50", "6"],
     ["ぶどう", "150", "2"],
@@ -124,17 +134,16 @@ data = [
 ws.setRangeData("A1", data)
 
 print("[1] setRangeData 投入後:")
-for a1 in ["A1", "B2", "C2"]:
+for a1 in ["A1", "B2", "C2", "D1"]:
     print(f"    {a1} = {json.dumps(ws.getRange(a1).getValue()[a1], ensure_ascii=False)}")
 
 # ---------- 2. 2次元配列による数式の一括高速投入 (setRangeFormulas) ----------
 formulas = [
-    ["金額"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ]
-ws.setRangeFormulas("D1", formulas)
+ws.setRangeFormulas("D2", formulas)
 
 print("[2] setRangeFormulas 投入後:")
 print("    数式 D2:D4 =", json.dumps(ws.getRange("D2:D4").getFormula(), ensure_ascii=False))
@@ -172,6 +181,7 @@ wb.save()
 wb.close()
 ```
 
+
 #### [Java]
 
 ```java
@@ -181,13 +191,13 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        App app = new App();
+        AppWrapper app = new AppWrapper();
         WorkBookWrapper wb = app.createWorkBook("bulk-input.xlsx");
         WorkSheetWrapper ws = wb.openWorkSheet("Sheet1");
 
         // ---------- 1. 2次元配列による値の一括高速投入 (setRangeData) ----------
         List<List<String>> data = Arrays.asList(
-            Arrays.asList("商品名", "単価", "数量"),
+            Arrays.asList("商品名", "単価", "数量", "金額"),
             Arrays.asList("りんご", "100", "3"),
             Arrays.asList("みかん", "50", "6"),
             Arrays.asList("ぶどう", "150", "2")
@@ -195,18 +205,17 @@ public class Main {
         ws.setRangeData("A1", data);
 
         System.out.println("[1] setRangeData 投入後:");
-        for (String a1 : Arrays.asList("A1", "B2", "C2")) {
+        for (String a1 : Arrays.asList("A1", "B2", "C2", "D1")) {
             System.out.println("    " + a1 + " = " + ws.getRange(a1).getValue().get(a1));
         }
 
         // ---------- 2. 2次元配列による数式の一括高速投入 (setRangeFormulas) ----------
         List<List<String>> formulas = Arrays.asList(
-            Collections.singletonList("金額"),
             Collections.singletonList("B2*C2"),
             Collections.singletonList("B3*C3"),
             Collections.singletonList("B4*C4")
         );
-        ws.setRangeFormulas("D1", formulas);
+        ws.setRangeFormulas("D2", formulas);
 
         System.out.println("[2] setRangeFormulas 投入後:");
         System.out.println("    数式 D2:D4 = " + ws.getRange("D2:D4").getFormula());
@@ -251,6 +260,7 @@ public class Main {
 }
 ```
 
+
 #### [PHP]
 
 ```php
@@ -263,7 +273,7 @@ $now = fn(): int => (int)(hrtime(true) / 1000000);   // ミリ秒
 
 // ---------- 1. 2次元配列による値の一括高速投入 (setRangeData) ----------
 $data = [
-    ["商品名", "単価", "数量"],
+    ["商品名", "単価", "数量", "金額"],
     ["りんご", "100", "3"],
     ["みかん", "50", "6"],
     ["ぶどう", "150", "2"],
@@ -271,18 +281,17 @@ $data = [
 $ws->setRangeData("A1", $data);
 
 echo "[1] setRangeData 投入後:\n";
-foreach (["A1", "B2", "C2"] as $a1) {
+foreach (["A1", "B2", "C2", "D1"] as $a1) {
     echo "    {$a1} = ", json_encode($ws->getRange($a1)->getValue()[$a1], JSON_UNESCAPED_UNICODE), "\n";
 }
 
 // ---------- 2. 2次元配列による数式の一括高速投入 (setRangeFormulas) ----------
 $formulas = [
-    ["金額"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ];
-$ws->setRangeFormulas("D1", $formulas);
+$ws->setRangeFormulas("D2", $formulas);
 
 echo "[2] setRangeFormulas 投入後:\n";
 echo "    数式 D2:D4 = ", json_encode($ws->getRange("D2:D4")->getFormula(), JSON_UNESCAPED_UNICODE), "\n";
@@ -326,6 +335,7 @@ $wb->save();
 $wb->close();
 ```
 
+
 #### [WebAssembly]
 
 ```javascript
@@ -336,7 +346,7 @@ const ws = wb.openWorkSheet("Sheet1");
 
 // ---------- 1. 2次元配列による値の一括高速投入 (setRangeData) ----------
 const data = [
-    ["商品名", "単価", "数量"],
+    ["商品名", "単価", "数量", "金額"],
     ["りんご", "100", "3"],
     ["みかん", "50", "6"],
     ["ぶどう", "150", "2"],
@@ -344,18 +354,17 @@ const data = [
 ws.setRangeData("A1", data);
 
 console.log("[1] setRangeData 投入後:");
-for (const a1 of ["A1", "B2", "C2"]) {
+for (const a1 of ["A1", "B2", "C2", "D1"]) {
     console.log(`    ${a1} = ${JSON.stringify(ws.getRange(a1).getValue()[a1])}`);
 }
 
 // ---------- 2. 2次元配列による数式の一括高速投入 (setRangeFormulas) ----------
 const formulas = [
-    ["金額"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ];
-ws.setRangeFormulas("D1", formulas);
+ws.setRangeFormulas("D2", formulas);
 
 console.log("[2] setRangeFormulas 投入後:");
 console.log("    数式 D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getFormula()));
@@ -398,33 +407,44 @@ wb.save();
 wb.close();
 ```
 
-```plaintext
-[1] setRangeData 投入後:
+
+`[1] setRangeData 投入後:
     A1 = "商品名"
     B2 = 100
     C2 = 3
+    D1 = "金額"
 [2] setRangeFormulas 投入後:
     数式 D2:D4 = {"D2":"B2*C2","D3":"B3*C3","D4":"B4*C4"}
     計算値 D2:D4 = {"D2":300,"D3":300,"D4":300}
 [3] 10000 セルの投入速度比較:
-    セルごと getCells().setNumberValue() : 102 ms
-    setRangeData (構築2 + 投入18) : 20 ms (最速)
-[検証] 両方式とも E2000 = 200005
-```
+    セルごと getCells().setNumberValue() : 72 ms
+    setRangeData (構築2 + 投入25) : 27 ms (最速)
+[検証] 両方式とも E2000 = 200005`
 
-`[3]` の ms は実行環境によって変わります（上記は 1 回の実行例）。
+`[3]` の ms は実行環境によって変わります（上記は実機での 1 実行例）。
+
 
 ## 解説
 
+
 ### 速度とパフォーマンス
 
-| セル数 | セルごと `getCells().setNumberValue()` | `setRangeData()` | 高速化倍率 |
-| --- | --- | --- | --- |
-| 10,000（2,000 行 x 5 列） | 約 102 ms | 約 20 ms（構築 2 + 投入 18） | **約 5 倍高速** |
-| 100,000（20,000 行 x 5 列） | 約 1,390 ms | 約 195 ms（構築 15 + 投入 180） | **約 7 倍高速** |
-| 200,000（50,000 行 x 4 列） | 約 3,200 ms | 約 380 ms | **約 8.4 倍高速** |
+
+同一環境（Linux x86_64 / Intel Xeon / Python・PHP 実測負荷テスト）におけるセル投入速度の比較です。
+
+
+| 規模（セル数） | セルごと `getCells().setNumberValue()` | `setRangeData()`（2次元配列一括投入） | 高速化倍率 | 実務上のメリット |
+| --- | --- | --- | --- | --- |
+| **10,000 セル**<br>2,000 行 x 5 列 | 約 72 〜 185 ms | **約 27 〜 95 ms**<br>（配列構築含む） | **約 2 〜 2.7 倍高速** | Web API の帳票ダウンロードが 0.1 秒未満で即座に完了。 |
+| **100,000 セル**<br>20,000 行 x 5 列 | 約 960 〜 1,300 ms | **約 280 〜 350 ms** | **約 3 〜 4.7 倍高速** | 10 万セルの巨大テーブルも 0.3 秒台で一括流し込み可能。 |
+| **200,000 セル**<br>50,000 行 x 4 列 | 約 2,200 〜 2,400 ms | **約 570 〜 630 ms** | **約 3.5 〜 4.1 倍高速** | 既存 OSS（PhpSpreadsheet / POI）が OOM（メモリ不足）で停止する規模でも低メモリで安全完走。 |
+
+
+※ ファイル保存（.xlsx 出力）や数式再計算を含めた総合プラットフォーム（GCP C3/C4・macOS M4・Windows 11）の実測限界ベンチマーク結果は、[3OS総合負荷テストレポート](/pages/benchmark_report.md) を参照してください。
+
 
 `setRangeData()` は、言語側のブリッジ境界呼び出しオーバーヘッドを最小化し、C++ エンジン側で直接セル配置および SST（共有文字列テーブル）登録を並列・一括処理するため、セル数が増えるほど圧倒的な差が生まれます。
+
 
 ### 使いどころ
 
@@ -432,24 +452,16 @@ wb.close();
 * **計算列の一括生成** — 行ごとに異なる相対参照の計算式を `ws.setRangeFormulas("D2", [["B2*C2"], ["B3*C3"], ...])` で一度に入力できます。
 * **セル数が数百件を超える場合** — 原則として `setRangeData()` / `setRangeFormulas()` の利用を強く推奨します。
 
+
 ## 注意点
 
 * **開始セル（左上）を指定します。** 第1引数に `"A1"` や `"B5"` などのセルアドレスを指定すると、そこを基点として 2次元配列の各要素が行・列方向に展開されます。
 * **数値文字列は自動的に数値セルとして判定されます。** `"100"` や `"-12.5"` などの数値として解釈可能な文字列は、Excel 内部でも数値型（Number）セルとして保存されるため、集計関数（SUM 等）の対象になります。
 * **数式には先頭の `=` を付けません。** `setRangeFormulas("D2", [["B2*C2"]])` のように記述します。
 
+
 ## 関連
 
 * [目次](index.md)
 * 前: [行・列・セル範囲の操作](general-05-rows-cols.md) / 次: [オートフィルターと並べ替え](general-07-autofilter-sort.md)
-* API リファレンス
-
-  #### [Node.js]
-
-  #### [Python]
-
-  #### [Java]
-
-  #### [PHP]
-
-  #### [WebAssembly]
+* API リファレンス             <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 active border-primary-600 text-primary-600" data-tab="node">Node.js</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="python">Python</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="java">Java</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="php">PHP</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="wasm">WebAssembly</button>          [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/nodejs/classes/nodeosbxl.WorkSheet.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/python/pyosbxl.WorkSheet.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/java/com/osboffice/osbxl/WorkSheetWrapper.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/php/classes/phposbxl-WorkSheet.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/wasm/classes/osbxl.WorkSheet.html)

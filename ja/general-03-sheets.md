@@ -2,235 +2,295 @@
 
 level: basic ／ verified: 2026-10-04 ／ 5言語タブ対応 ／ [English](../en/general-03-sheets.md)
 
+
 ## やりたいこと
+
 
 1 つのブックの中でワークシートを追加・削除・移動・リネームし、 インデックスでシートを辿ったり、開いたときに表示されるシート（アクティブタブ）を制御する。
 
+
 ## 対象メソッド
+
 
 | メソッド | 所属 | 説明 |
 | --- | --- | --- |
 | `addWorkSheet(sheetName, position?)` | WorkBook | ワークシートを追加します。 |
 | `deleteWorkSheet(sheetName)` | WorkBook | ワークシートを削除します。 |
 | `moveSheet(sheetName, position)` | WorkBook | ワークシートを移動します。 |
-| `openWorkSheet(sheetName)` | WorkBook | ワークシートを名前で開きます。 |
-| `openWorkSheetByIndex(sheetIndex)` | WorkBook | ワークシートをインデックスで開きます。 |
+| `openWorkSheet(sheetName | index)` | WorkBook | ワークシートを名前またはインデックス（0 始まり）で開きます。※旧 openWorkSheetByIndex は非推奨。 |
 | `getSheetCount()` | WorkBook | ワークシート数を取得します。 |
 | `getSheetNumber(sheetName)` | WorkBook | ワークシートのシート番号を取得します。 |
 | `getName()` / `setName(name)` | WorkSheet | シート名称の取得 / 設定を行います。 |
 | `isActive()` / `activate(isActive)` | WorkSheet | アクティブタブ（起動時の表示項目）の取得 / 設定を行います。 |
 
+
 ## コード
 
+
 実行結果:
+
 
 #### [Node.js]
 
 ```javascript
 // sheets.js — シートの追加・移動・リネーム・削除と、インデックスアクセス
 const { nodeosbxl } = require("nodeosbxl");
+
 const app = new nodeosbxl.App();
 const wb = app.createWorkBook("sheets.xlsx");
-// インデックスは 1 始まり。1..getSheetCount() を順に開いて名前を並べる
+
+// インデックスは 0 始まり (zeroBase)。0..getSheetCount()-1 を順に開いて名前を並べる
 const show = (label) => {
-const names = [];
-for (let i = 1; i <= wb.getSheetCount(); i++) {
-names.push(wb.openWorkSheetByIndex(i).getName());
-}
-console.log(`${label} count=${wb.getSheetCount()} [${names.join(", ")}]`);
+    const names = [];
+    for (let i = 0; i < wb.getSheetCount(); i++) {
+        names.push(wb.openWorkSheet(i).getName());
+    }
+    console.log(`${label} count=${wb.getSheetCount()} [${names.join(", ")}]`);
 };
-show("[1] 新規作成直後 :");
-wb.addWorkSheet("集計"); // position 省略 → 末尾に追加
-show("[2] addWorkSheet(集計) :");
-wb.addWorkSheet("受注", 1); // position=1 → 先頭に挿入
-show("[3] addWorkSheet(受注,1):");
-wb.moveSheet("受注", 3); // 3 番目へ移動
-show("[4] moveSheet(受注,3) :");
+
+show("[1] 新規作成直後        :");
+
+wb.addWorkSheet("集計");                       // position 省略 → 末尾に追加
+show("[2] addWorkSheet(集計)  :");
+
+wb.addWorkSheet("受注", 0);                    // position=0 → 先頭に挿入 (0-based)
+show("[3] addWorkSheet(受注,0):");
+
+wb.moveSheet("受注", 2);                       // 3 番目へ移動 (0-based: index 2)
+show("[4] moveSheet(受注,2)   :");
+
 const ws = wb.openWorkSheet("受注");
 console.log("[5] getName() =", ws.getName(), "/ getSheetNumber(受注) =", wb.getSheetNumber("受注"));
 ws.getRange("A1:A1").setValue("受注データ");
-wb.openWorkSheet("Sheet1").setName("明細"); // リネーム
-show("[6] setName(明細) :");
+
+wb.openWorkSheet("Sheet1").setName("明細");     // リネーム
+show("[6] setName(明細)       :");
+
 // --- アクティブタブ（ブックを開いたときに手前に表示されるシート）---
 console.log("[7] isActive: 集計 =", wb.openWorkSheet("集計").isActive(),
-"/ 明細 =", wb.openWorkSheet("明細").isActive());
-wb.openWorkSheet("集計").activate(true); // 他のシートのアクティブは自動的に解除されます
-console.log(" activate後: 集計 =", wb.openWorkSheet("集計").isActive(),
-"/ 明細 =", wb.openWorkSheet("明細").isActive());
+            "/ 明細 =", wb.openWorkSheet("明細").isActive());
+wb.openWorkSheet("集計").activate(true);   // 他のシートのアクティブは自動的に解除されます
+console.log("    activate後: 集計 =", wb.openWorkSheet("集計").isActive(),
+            "/ 明細 =", wb.openWorkSheet("明細").isActive());
+
 // --- 削除 ---
 wb.addWorkSheet("一時");
 wb.deleteWorkSheet("一時");
 show("[8] deleteWorkSheet(一時):");
+
 wb.save();
 wb.close();
+
 // --- 開き直して確認 ---
 const wb2 = app.openWorkBook("sheets.xlsx");
 const names = [];
-for (let i = 1; i <= wb2.getSheetCount(); i++) names.push(wb2.openWorkSheetByIndex(i).getName());
+for (let i = 0; i < wb2.getSheetCount(); i++) names.push(wb2.openWorkSheet(i).getName());
 console.log("[終] シート構成:", names.join(", "));
-console.log(" 受注!A1 =", wb2.openWorkSheet("受注").getRange("A1:A1").getValue()["A1"]);
+console.log("     受注!A1 =", wb2.openWorkSheet("受注").getRange("A1:A1").getValue()["A1"]);
 wb2.close();
 ```
+
 
 #### [Python]
 
 ```python
 # sheets.py — node 版サンプルと同一検証 (pyosbxl)
 import pyosbxl
+
 app = pyosbxl.App()
 wb = app.createWorkBook("sheets-py.xlsx")
+
 def b(x):
-# python の True/False を node の true/false 表記に合わせる
-return "true" if x else "false"
-# インデックスは 1 始まり。1..getSheetCount() を順に開いて名前を並べる
+    # python の True/False を node の true/false 表記に合わせる
+    return "true" if x else "false"
+
+# インデックスは 0 始まり (zeroBase)。0..getSheetCount()-1 を順に開いて名前を並べる
 def show(label):
-names = [wb.openWorkSheetByIndex(i).getName() for i in range(1, wb.getSheetCount() + 1)]
-print(f"{label} count={wb.getSheetCount()} [{', '.join(names)}]")
-show("[1] 新規作成直後 :")
-wb.addWorkSheet("集計") # position 省略 → 末尾に追加
-show("[2] addWorkSheet(集計) :")
-wb.addWorkSheet("受注", 1) # position=1 → 先頭に挿入
-show("[3] addWorkSheet(受注,1):")
-wb.moveSheet("受注", 3) # 3 番目へ移動
-show("[4] moveSheet(受注,3) :")
+    names = [wb.openWorkSheet(i).getName() for i in range(wb.getSheetCount())]
+    print(f"{label} count={wb.getSheetCount()} [{', '.join(names)}]")
+
+show("[1] 新規作成直後        :")
+
+wb.addWorkSheet("集計")                       # position 省略 → 末尾に追加
+show("[2] addWorkSheet(集計)  :")
+
+wb.addWorkSheet("受注", 0)                    # position=0 → 先頭に挿入 (0-based)
+show("[3] addWorkSheet(受注,0):")
+
+wb.moveSheet("受注", 2)                       # 3 番目へ移動 (0-based: index 2)
+show("[4] moveSheet(受注,2)   :")
+
 ws = wb.openWorkSheet("受注")
 print("[5] getName() =", ws.getName(), "/ getSheetNumber(受注) =", wb.getSheetNumber("受注"))
 ws.getRange("A1:A1").setValue("受注データ")
-wb.openWorkSheet("Sheet1").setName("明細") # リネーム
-show("[6] setName(明細) :")
+
+wb.openWorkSheet("Sheet1").setName("明細")    # リネーム
+show("[6] setName(明細)       :")
+
 # --- アクティブタブ（ブックを開いたときに手前に表示されるシート）---
 print("[7] isActive: 集計 =", b(wb.openWorkSheet("集計").isActive()),
-"/ 明細 =", b(wb.openWorkSheet("明細").isActive()))
-wb.openWorkSheet("集計").activate(True) # 他のシートのアクティブは自動的に解除されます
-print(" activate後: 集計 =", b(wb.openWorkSheet("集計").isActive()),
-"/ 明細 =", b(wb.openWorkSheet("明細").isActive()))
+      "/ 明細 =", b(wb.openWorkSheet("明細").isActive()))
+wb.openWorkSheet("集計").activate(True)       # 他のシートのアクティブは自動的に解除されます
+print("    activate後: 集計 =", b(wb.openWorkSheet("集計").isActive()),
+      "/ 明細 =", b(wb.openWorkSheet("明細").isActive()))
+
 # --- 削除 ---
 wb.addWorkSheet("一時")
 wb.deleteWorkSheet("一時")
 show("[8] deleteWorkSheet(一時):")
+
 wb.save()
 wb.close()
+
 # --- 開き直して確認 ---
 wb2 = app.openWorkBook("sheets-py.xlsx")
-names = [wb2.openWorkSheetByIndex(i).getName() for i in range(1, wb2.getSheetCount() + 1)]
+names = [wb2.openWorkSheet(i).getName() for i in range(wb2.getSheetCount())]
 print("[終] シート構成:", ", ".join(names))
-print(" 受注!A1 =", wb2.openWorkSheet("受注").getRange("A1:A1").getValue()["A1"])
+print("     受注!A1 =", wb2.openWorkSheet("受注").getRange("A1:A1").getValue()["A1"])
 wb2.close()
 ```
+
 
 #### [Java]
 
 ```java
 // sheets.java — node 版サンプルと同一検証 (javaosbxl)
-import com.osboffice.osbxl.\*;
+import com.osboffice.osbxl.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 public class Main {
-static WorkBookWrapper wb;
-// インデックスは 1 始まり。1..getSheetCount() を順に開いて名前を並べる
-static void show(String label) {
-List<String> names = new ArrayList<>();
-for (int i = 1; i <= wb.getSheetCount(); i++) {
-names.add(wb.openWorkSheetByIndex(i).getName());
-}
-System.out.println(label + " count=" + wb.getSheetCount()
-+ " [" + String.join(", ", names) + "]");
-}
-public static void main(String[] args) {
-AppWrapper app = new AppWrapper();
-wb = app.createWorkBook("sheets-java.xlsx");
-show("[1] 新規作成直後 :");
-wb.addWorkSheet("集計"); // position 省略 → 末尾に追加
-show("[2] addWorkSheet(集計) :");
-wb.addWorkSheet("受注", 1); // position=1 → 先頭に挿入
-show("[3] addWorkSheet(受注,1):");
-wb.moveSheet("受注", 3); // 3 番目へ移動
-show("[4] moveSheet(受注,3) :");
-WorkSheetWrapper ws = wb.openWorkSheet("受注");
-System.out.println("[5] getName() = " + ws.getName()
-+ " / getSheetNumber(受注) = " + wb.getSheetNumber("受注"));
-ws.getRange("A1:A1").setValue("受注データ");
-wb.openWorkSheet("Sheet1").setName("明細"); // リネーム
-show("[6] setName(明細) :");
-// --- アクティブタブ（ブックを開いたときに手前に表示されるシート）---
-System.out.println("[7] isActive: 集計 = " + wb.openWorkSheet("集計").isActive()
-+ " / 明細 = " + wb.openWorkSheet("明細").isActive());
-wb.openWorkSheet("集計").activate(true); // 他のシートのアクティブは自動的に解除されます
-System.out.println(" activate後: 集計 = " + wb.openWorkSheet("集計").isActive()
-+ " / 明細 = " + wb.openWorkSheet("明細").isActive());
-// --- 削除 ---
-wb.addWorkSheet("一時");
-wb.deleteWorkSheet("一時");
-show("[8] deleteWorkSheet(一時):");
-wb.save();
-wb.close();
-// --- 開き直して確認 ---
-WorkBookWrapper wb2 = app.openWorkBook("sheets-java.xlsx");
-List<String> names = new ArrayList<>();
-for (int i = 1; i <= wb2.getSheetCount(); i++) names.add(wb2.openWorkSheetByIndex(i).getName());
-System.out.println("[終] シート構成: " + String.join(", ", names));
-Map<String, String> v = wb2.openWorkSheet("受注").getRange("A1:A1").getValue();
-System.out.println(" 受注!A1 = " + v.get("A1"));
-wb2.close();
-}
+    static WorkBookWrapper wb;
+
+    // インデックスは 0 始まり (zeroBase)。0..getSheetCount()-1 を順に開いて名前を並べる
+    static void show(String label) {
+        List<String> names = new ArrayList<>();
+        for (int i = 0; i < wb.getSheetCount(); i++) {
+            names.add(wb.openWorkSheet(i).getName());
+        }
+        System.out.println(label + " count=" + wb.getSheetCount()
+                + " [" + String.join(", ", names) + "]");
+    }
+
+    public static void main(String[] args) {
+        AppWrapper app = new AppWrapper();
+        wb = app.createWorkBook("sheets-java.xlsx");
+
+        show("[1] 新規作成直後        :");
+
+        wb.addWorkSheet("集計");                       // position 省略 → 末尾に追加
+        show("[2] addWorkSheet(集計)  :");
+
+        wb.addWorkSheet("受注", 0);                    // position=0 → 先頭に挿入 (0-based)
+        show("[3] addWorkSheet(受注,0):");
+
+        wb.moveSheet("受注", 2);                       // 3 番目へ移動 (0-based: index 2)
+        show("[4] moveSheet(受注,2)   :");
+
+        WorkSheetWrapper ws = wb.openWorkSheet("受注");
+        System.out.println("[5] getName() = " + ws.getName()
+                + " / getSheetNumber(受注) = " + wb.getSheetNumber("受注"));
+        ws.getRange("A1:A1").setValue("受注データ");
+
+        wb.openWorkSheet("Sheet1").setName("明細");    // リネーム
+        show("[6] setName(明細)       :");
+
+        // --- アクティブタブ（ブックを開いたときに手前に表示されるシート）---
+        System.out.println("[7] isActive: 集計 = " + wb.openWorkSheet("集計").isActive()
+                + " / 明細 = " + wb.openWorkSheet("明細").isActive());
+        wb.openWorkSheet("集計").activate(true);       // 他のシートのアクティブは自動的に解除されます
+        System.out.println("    activate後: 集計 = " + wb.openWorkSheet("集計").isActive()
+                + " / 明細 = " + wb.openWorkSheet("明細").isActive());
+
+        // --- 削除 ---
+        wb.addWorkSheet("一時");
+        wb.deleteWorkSheet("一時");
+        show("[8] deleteWorkSheet(一時):");
+
+        wb.save();
+        wb.close();
+
+        // --- 開き直して確認 ---
+        WorkBookWrapper wb2 = app.openWorkBook("sheets-java.xlsx");
+        List<String> names = new ArrayList<>();
+        for (int i = 0; i < wb2.getSheetCount(); i++) names.add(wb2.openWorkSheet(i).getName());
+        System.out.println("[終] シート構成: " + String.join(", ", names));
+        Map<String, String> v = wb2.openWorkSheet("受注").getRange("A1:A1").getValue();
+        System.out.println("     受注!A1 = " + v.get("A1"));
+        wb2.close();
+    }
 }
 ```
+
 
 #### [PHP]
 
 ```php
-// sheets.md — node 版サンプルと同一検証 (phposbxl)。ボディのみ (<?php・autoload は harness 付与)
+// sheets.php — node 版サンプルと同一検証 (phposbxl)。ボディのみ (<?php・autoload は harness 付与)
 $app = new \phposbxl\App();
 $wb = $app->createWorkBook("sheets-php.xlsx");
+
 // PHP の bool を node の true/false 表記に合わせる
 function b($x) {
-return $x ? "true" : "false";
+    return $x ? "true" : "false";
 }
-// インデックスは 1 始まり。1..getSheetCount() を順に開いて名前を並べる
+
+// インデックスは 0 始まり (zeroBase)。0..getSheetCount()-1 を順に開いて名前を並べる
 function show($label) {
-global $wb;
-$names = [];
-for ($i = 1; $i <= $wb->getSheetCount(); $i++) {
-$names[] = $wb->openWorkSheetByIndex($i)->getName();
+    global $wb;
+    $names = [];
+    for ($i = 0; $i < $wb->getSheetCount(); $i++) {
+        $names[] = $wb->openWorkSheet($i)->getName();
+    }
+    echo $label . " count=" . $wb->getSheetCount() . " [" . implode(", ", $names) . "]\n";
 }
-echo $label . " count=" . $wb->getSheetCount() . " [" . implode(", ", $names) . "]\n";
-}
-show("[1] 新規作成直後 :");
-$wb->addWorkSheet("集計"); // position 省略 → 末尾に追加
-show("[2] addWorkSheet(集計) :");
-$wb->addWorkSheet("受注", 1); // position=1 → 先頭に挿入
-show("[3] addWorkSheet(受注,1):");
-$wb->moveSheet("受注", 3); // 3 番目へ移動
-show("[4] moveSheet(受注,3) :");
+
+show("[1] 新規作成直後        :");
+
+$wb->addWorkSheet("集計");                       // position 省略 → 末尾に追加
+show("[2] addWorkSheet(集計)  :");
+
+$wb->addWorkSheet("受注", 0);                    // position=1 → 先頭に挿入
+show("[3] addWorkSheet(受注,0):");
+
+$wb->moveSheet("受注", 2);                       // 3 番目へ移動
+show("[4] moveSheet(受注,2)   :");
+
 $ws = $wb->openWorkSheet("受注");
 echo "[5] getName() = " . $ws->getName() . " / getSheetNumber(受注) = " . $wb->getSheetNumber("受注") . "\n";
 $ws->getRange("A1:A1")->setValue("受注データ");
-$wb->openWorkSheet("Sheet1")->setName("明細"); // リネーム
-show("[6] setName(明細) :");
+
+$wb->openWorkSheet("Sheet1")->setName("明細");   // リネーム
+show("[6] setName(明細)       :");
+
 // --- アクティブタブ（ブックを開いたときに手前に表示されるシート）---
 echo "[7] isActive: 集計 = " . b($wb->openWorkSheet("集計")->isActive())
-. " / 明細 = " . b($wb->openWorkSheet("明細")->isActive()) . "\n";
-$wb->openWorkSheet("集計")->activate(true); // 他のシートのアクティブは自動的に解除されます
-echo " activate後: 集計 = " . b($wb->openWorkSheet("集計")->isActive())
-. " / 明細 = " . b($wb->openWorkSheet("明細")->isActive()) . "\n";
+   . " / 明細 = " . b($wb->openWorkSheet("明細")->isActive()) . "\n";
+$wb->openWorkSheet("集計")->activate(true);      // 他のシートのアクティブは自動的に解除されます
+echo "    activate後: 集計 = " . b($wb->openWorkSheet("集計")->isActive())
+   . " / 明細 = " . b($wb->openWorkSheet("明細")->isActive()) . "\n";
+
 // --- 削除 ---
 $wb->addWorkSheet("一時");
 $wb->deleteWorkSheet("一時");
 show("[8] deleteWorkSheet(一時):");
+
 $wb->save();
 $wb->close();
+
 // --- 開き直して確認 ---
 $wb2 = $app->openWorkBook("sheets-php.xlsx");
 $names = [];
-for ($i = 1; $i <= $wb2->getSheetCount(); $i++) {
-$names[] = $wb2->openWorkSheetByIndex($i)->getName();
+for ($i = 0; $i < $wb2->getSheetCount(); $i++) {
+    $names[] = $wb2->openWorkSheet($i)->getName();
 }
 echo "[終] シート構成: " . implode(", ", $names) . "\n";
 $v = $wb2->openWorkSheet("受注")->getRange("A1:A1")->getValue();
-echo " 受注!A1 = " . $v["A1"] . "\n";
+echo "     受注!A1 = " . $v["A1"] . "\n";
 $wb2->close();
 ```
+
 
 #### [WebAssembly]
 
@@ -241,105 +301,116 @@ $wb2->close();
 // （Node.js 版の require("nodeosbxl") に相当）。
 const app = new osbxl.App();
 const wb = app.createWorkBook("sheets-wasm.xlsx");
-// インデックスは 1 始まり。1..getSheetCount() を順に開いて名前を並べる
+
+// インデックスは 0 始まり (zeroBase)。0..getSheetCount()-1 を順に開いて名前を並べる
 const show = (label) => {
-const names = [];
-for (let i = 1; i <= wb.getSheetCount(); i++) {
-names.push(wb.openWorkSheetByIndex(i).getName());
-}
-console.log(`${label} count=${wb.getSheetCount()} [${names.join(", ")}]`);
+    const names = [];
+    for (let i = 0; i < wb.getSheetCount(); i++) {
+        names.push(wb.openWorkSheet(i).getName());
+    }
+    console.log(`${label} count=${wb.getSheetCount()} [${names.join(", ")}]`);
 };
-show("[1] 新規作成直後 :");
-wb.addWorkSheet("集計"); // position 省略 → 末尾に追加
-show("[2] addWorkSheet(集計) :");
-wb.addWorkSheet("受注", 1); // position=1 → 先頭に挿入
-show("[3] addWorkSheet(受注,1):");
-wb.moveSheet("受注", 3); // 3 番目へ移動
-show("[4] moveSheet(受注,3) :");
+
+show("[1] 新規作成直後        :");
+
+wb.addWorkSheet("集計");                       // position 省略 → 末尾に追加
+show("[2] addWorkSheet(集計)  :");
+
+wb.addWorkSheet("受注", 0);                    // position=0 → 先頭に挿入 (0-based)
+show("[3] addWorkSheet(受注,0):");
+
+wb.moveSheet("受注", 2);                       // 3 番目へ移動 (0-based: index 2)
+show("[4] moveSheet(受注,2)   :");
+
 const ws = wb.openWorkSheet("受注");
 console.log("[5] getName() =", ws.getName(), "/ getSheetNumber(受注) =", wb.getSheetNumber("受注"));
 ws.getRange("A1:A1").setValue("受注データ");
-wb.openWorkSheet("Sheet1").setName("明細"); // リネーム
-show("[6] setName(明細) :");
+
+wb.openWorkSheet("Sheet1").setName("明細");     // リネーム
+show("[6] setName(明細)       :");
+
 // --- アクティブタブ（ブックを開いたときに手前に表示されるシート）---
 console.log("[7] isActive: 集計 =", wb.openWorkSheet("集計").isActive(),
-"/ 明細 =", wb.openWorkSheet("明細").isActive());
-wb.openWorkSheet("集計").activate(true); // 他のシートのアクティブは自動的に解除されます
-console.log(" activate後: 集計 =", wb.openWorkSheet("集計").isActive(),
-"/ 明細 =", wb.openWorkSheet("明細").isActive());
+            "/ 明細 =", wb.openWorkSheet("明細").isActive());
+wb.openWorkSheet("集計").activate(true);   // 他のシートのアクティブは自動的に解除されます
+console.log("    activate後: 集計 =", wb.openWorkSheet("集計").isActive(),
+            "/ 明細 =", wb.openWorkSheet("明細").isActive());
+
 // --- 削除 ---
 wb.addWorkSheet("一時");
 wb.deleteWorkSheet("一時");
 show("[8] deleteWorkSheet(一時):");
+
 wb.save();
 wb.close();
+
 // --- 開き直して確認 ---
 const wb2 = app.openWorkBook("sheets-wasm.xlsx");
 const names = [];
-for (let i = 1; i <= wb2.getSheetCount(); i++) names.push(wb2.openWorkSheetByIndex(i).getName());
+for (let i = 0; i < wb2.getSheetCount(); i++) names.push(wb2.openWorkSheet(i).getName());
 console.log("[終] シート構成:", names.join(", "));
-console.log(" 受注!A1 =", wb2.openWorkSheet("受注").getRange("A1:A1").getValue()["A1"]);
+console.log("     受注!A1 =", wb2.openWorkSheet("受注").getRange("A1:A1").getValue()["A1"]);
 wb2.close();
 ```
 
-```plaintext
-[1] 新規作成直後 : count=1 [Sheet1]
-[2] addWorkSheet(集計) : count=2 [Sheet1, 集計]
+
+`[1] 新規作成直後        : count=1 [Sheet1]
+[2] addWorkSheet(集計)  : count=2 [Sheet1, 集計]
 [3] addWorkSheet(受注,1): count=3 [受注, Sheet1, 集計]
-[4] moveSheet(受注,3) : count=3 [Sheet1, 集計, 受注]
+[4] moveSheet(受注,3)   : count=3 [Sheet1, 集計, 受注]
 [5] getName() = 受注 / getSheetNumber(受注) = 3
-[6] setName(明細) : count=3 [明細, 集計, 受注]
+[6] setName(明細)       : count=3 [明細, 集計, 受注]
 [7] isActive: 集計 = false / 明細 = true
-activate後: 集計 = true / 明細 = false
+    activate後: 集計 = true / 明細 = false
 [8] deleteWorkSheet(一時): count=3 [明細, 集計, 受注]
 [終] シート構成: 明細, 集計, 受注
-受注!A1 = 受注データ
-```
+     受注!A1 = 受注データ`
 
-## 解説
+<h2 id="解説" class="text-2xl font-bold mt-10 mb-4">解説</h2>
+<ul class="space-y-2 mb-4">
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4">**`position` とシート番号は既定で 0 始まり（zeroBase）。** `addWorkSheet(name, position)` は **`position` の前に挿入**します（`position` = 0 なら先頭）。**省略（既定値 -1）で末尾に追加されます。  
+<small class="text-slate-500">※バージョン1互換（1始まり）で初期化している場合は 1 が先頭となります。</small></li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4"><strong>`moveSheet(name, position)` の `position` は「移動後の位置」**で、既定では先頭が 0 です。</li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4">**`openWorkSheet(i)` も既定で 0 始まり。** `getSheetCount()` と組み合わせると 全シートを名前で列挙できます（上記の `show()`）。** シート名が分からないブックを扱うときは、この形で辿るのが確実です。</li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4"><strong>`getSheetNumber(name)` は現在の並び順での番号**を返します。** `moveSheet()` や `deleteWorkSheet()` の後は値が変わります。</li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4"><strong>`setName()` は即座に反映されます。** 以降は新しい名前で `openWorkSheet()` します。** 古い名前で開こうとすると例外になります。</li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4"><strong>`activate(true)` は排他的に働きます。** 目的のシートを `activate(true)` にすると、 他のシートのアクティブは**自動的に解除されます**（実測）。** あらかじめ他を `activate(false)` にする必要はありません。  
+ アクティブ状態は `save()` して開き直しても保持されます。</li>
+</ul>
+<h2 id="注意点" class="text-2xl font-bold mt-10 mb-4">注意点</h2>
+<ul class="space-y-2 mb-4">
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4"><strong>存在しないシート名を `openWorkSheet()` に渡すと例外になります。**`wb.openWorkSheet("NoSuch");   // → 例外: "NoSuch is not found"`ユーザー入力や外部設定からシート名を受ける場合は、事前に `getSheetCount()` + `openWorkSheet(index)` で名前を列挙して照合してください。</li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4">**`openWorkSheet(index)` の範囲外インデックスも例外になります。** 既定（zeroBase）では `0` 〜 `getSheetCount() - 1` の範囲で呼び出してください。</li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4">**新規作成直後は既定シート（`Sheet1`）だけが `isActive() === true`** です（実測）。** `addWorkSheet()` で追加したシートは `false` になります。  
+ ブックを開いたときに別のシートを手前に見せたいなら、そのシートで `activate(true)` を呼んでください。</li>
+  <li class="text-slate-700 leading-relaxed border-l-4 border-surface-200 pl-4"><strong>シートを跨いだセルコピーは `copyRow` / `copyCol` / `copyCell` を使います** （コピー元をシート名で指定）。  
+詳細は [行・列・セル範囲の操作](general-05-rows-cols.md)。  
+ 図形（グラフ含む）・ピボットテーブル・queryTable 形式のテーブル・データテーブルは コピー対象に含まれません。</li>
+</ul>
+<h2 id="関連" class="text-2xl font-bold mt-10 mb-4">関連</h2>
+<ul class="list-disc pl-6 mb-4 space-y-1 text-slate-700">
+  <li>[目次](index.md)</li>
+  <li>前: [値と数式を入れて表を作る](general-02-values-formulas.md) / 次: [セル値の型と表示書式](general-04-value-types.md)</li>
+<li>
+  API リファレンス
+  
+    
+    <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 active border-primary-600 text-primary-600" data-tab="node">Node.js</button>
+    <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="python">Python</button>
+    <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="java">Java</button>
+    <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="php">PHP</button>
+    <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="wasm">WebAssembly</button>
+    
+    [WorkBook](/api-docs/nodejs/classes/nodeosbxl.WorkBook.html) / [WorkSheet](/api-docs/nodejs/classes/nodeosbxl.WorkSheet.html)
 
-* **`position` とシート番号はどちらも 1 始まり。** `addWorkSheet(name, position)` は **`position` の前に挿入**します（`position` = 1 なら先頭）。  
-  省略（既定値 -1）で末尾に追加されます。
-* **`moveSheet(name, position)` の `position` は「移動後の位置」**で、先頭が 1 です。
-* **`openWorkSheetByIndex(i)` も 1 始まり。** `getSheetCount()` と組み合わせると 全シートを名前で列挙できます（上記の `show()`）。  
-   シート名が分からないブックを扱うときは、この形で辿るのが確実です。
-* **`getSheetNumber(name)` は現在の並び順での番号**を返します。  
-   `moveSheet()` や `deleteWorkSheet()` の後は値が変わります。
-* **`setName()` は即座に反映されます。** 以降は新しい名前で `openWorkSheet()` します。  
-   古い名前で開こうとすると例外になります。
-* **`activate(true)` は排他的に働きます。** 目的のシートを `activate(true)` にすると、 他のシートのアクティブは**自動的に解除されます**（実測）。  
-   あらかじめ他を `activate(false)` にする必要はありません。  
-   アクティブ状態は `save()` して開き直しても保持されます。
 
-## 注意点
+[WorkBook](/api-docs/python/pyosbxl.WorkBook.html) / [WorkSheet](/api-docs/python/pyosbxl.WorkSheet.html)
 
-* **存在しないシート名を `openWorkSheet()` に渡すと例外になります。**
 
-  ```javascript
-  wb.openWorkSheet("NoSuch"); // → 例外: "NoSuch is not found"
-  ```
+[WorkBook](/api-docs/java/com/osboffice/osbxl/WorkBookWrapper.html) / [WorkSheet](/api-docs/java/com/osboffice/osbxl/WorkSheetWrapper.html)
 
-  ユーザー入力や外部設定からシート名を受ける場合は、事前に `getSheetCount()` + `openWorkSheetByIndex()` で名前を列挙して照合してください。
-* **`openWorkSheetByIndex()` の範囲外インデックスも例外になります。** `1` 〜 `getSheetCount()` の範囲で呼び出してください。
-* **新規作成直後は既定シート（`Sheet1`）だけが `isActive() === true`** です（実測）。  
-   `addWorkSheet()` で追加したシートは `false` になります。  
-   ブックを開いたときに別のシートを手前に見せたいなら、そのシートで `activate(true)` を呼んでください。
-* **シートを跨いだセルコピーは `copyRow` / `copyCol` / `copyCell` を使います** （コピー元をシート名で指定）。  
-  詳細は [行・列・セル範囲の操作](general-05-rows-cols.md)。  
-   図形（グラフ含む）・ピボットテーブル・queryTable 形式のテーブル・データテーブルは コピー対象に含まれません。
 
-## 関連
+[WorkBook](/api-docs/php/classes/phposbxl-WorkBook.html) / [WorkSheet](/api-docs/php/classes/phposbxl-WorkSheet.html)
 
-* [目次](index.md)
-* 前: [値と数式を入れて表を作る](general-02-values-formulas.md) / 次: [セル値の型と表示書式](general-04-value-types.md)
-* API リファレンス
 
-  #### [Node.js]
-
-  #### [Python]
-
-  #### [Java]
-
-  #### [PHP]
-
-  #### [WebAssembly]
+[WorkBook](/api-docs/wasm/classes/osbxl.WorkBook.html) / [WorkSheet](/api-docs/wasm/classes/osbxl.WorkSheet.html)

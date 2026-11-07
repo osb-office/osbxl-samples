@@ -31,6 +31,7 @@ These osbxl samples have all been executed and verified. The code on each page r
 | Set conditional formatting (color scales, data bars, top N) | [general-09 Conditional formatting](general-09-conditional-format.md) |
 | Create charts (column, line) | [general-10 Charts](general-10-charts.md) |
 | Aggregate with pivot tables | [general-11 Pivot tables](general-11-pivottables.md) |
+| Export Excel to PDF (page setup, margins, print area) | [general-12 PDF Export](general-12-pdf-export.md) |
 | Detailed Feature Comparison & Benchmarks vs POI / openpyxl / PHP | [Benchmark Comparison Report](benchmark-comparison.md) |
 | Linux / macOS (M4) Stress Benchmark (500 to 50k rows) | [Linux & macOS Benchmark & Architecture Report](../benchmarks/BENCHMARK_REPORT_LINUX_MAC.en.md) |
 
@@ -49,6 +50,7 @@ These osbxl samples have all been executed and verified. The code on each page r
 | 09 | [Conditional formatting — cell value rules, color scales, data bars](general-09-conditional-format.md) | intermediate | FormatConditions / ColorScaleObject / DataBarObject |
 | 10 | [Charts basics — column, line, title, axes, legend](general-10-charts.md) | intermediate | Chart / chart.\* / enums.XlChartType |
 | 11 | [Pivot tables — create, aggregate, change aggregation method](general-11-pivottables.md) | advanced | PivotTable / PivotField |
+| 12 | [PDF Export — Page Setup, Margins, Print Area & Paper Size](general-12-pdf-export.md) | advanced | WorkBook (saveAsPdf / saveAsPdfToBuffer) / PageSetupObject |
 
 ## Planned (not yet written)
 

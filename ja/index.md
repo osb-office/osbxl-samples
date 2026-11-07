@@ -31,6 +31,7 @@
 | 条件付き書式（カラースケール・データバー・上位 N）を設定したい | [general-09 条件付き書式](general-09-conditional-format.md) |
 | グラフ（縦棒・折れ線）を作成したい | [general-10 チャート](general-10-charts.md) |
 | ピボットテーブルで集計したい | [general-11 ピボットテーブル](general-11-pivottables.md) |
+| Excel から PDF を出力したい（ページ設定・余白・印刷範囲） | [general-12 PDF エクスポート](general-12-pdf-export.md) |
 | 他ライブラリ（POI/openpyxl/PHP）との詳細機能対比・ベンチマーク | [ベンチマーク比較実測レポート](benchmark-comparison.md) |
 | Linux / macOS (M4) 実測負荷テスト（500〜50,000行） | [Linux・macOS 総合負荷テスト実測レポート](../benchmarks/BENCHMARK_REPORT_LINUX_MAC.md) |
 
@@ -49,6 +50,7 @@
 | 09 | [条件付き書式 — セル値ルール・カラースケール・データバー](general-09-conditional-format.md) | intermediate | FormatConditions / ColorScaleObject / DataBarObject |
 | 10 | [チャートの基本 — 縦棒・折れ線・タイトル・軸・凡例](general-10-charts.md) | intermediate | Chart / chart.\* / enums.XlChartType |
 | 11 | [ピボットテーブル — 作成・集計・集計方法の変更](general-11-pivottables.md) | advanced | PivotTable / PivotField |
+| 12 | [PDF エクスポート — ページ設定・余白・印刷範囲・用紙サイズ](general-12-pdf-export.md) | advanced | WorkBook (saveAsPdf / saveAsPdfToBuffer) / PageSetupObject |
 
 ## 予定（未作成）
 

@@ -1,6 +1,6 @@
 # osbxl サンプル集 (osbxl-samples)
 
-> **最終更新日: 2026年10月18日**（osbxl `v1.5.1` 最新実測値反映）  
+> **最終更新日: 2026年11月7日**（osbxl `v2.0.0` 最新実測値反映）  
 > [English README is available here](README.md)
 
 **[osbxl 公式サイト (https://osb-office.com)](https://osb-office.com/)** の公式サンプルコード・パターン集です。  
@@ -15,7 +15,7 @@ osbxl は、AI によるコード自動生成に対応した、C++ 製コアに�
 
 ## 📊 主要Excelライブラリとの違い・性能比較
 
-> 📈 **[最新！マルチプラットフォーム総合実測負荷テスト レポート (v1.5.1)](benchmarks/BENCHMARK_REPORT_LINUX_MAC.md)**: クラウド（GCP C3/C4）・macOS（Apple M4）における徹底検証。従来のライブラリが OOM で落ちる 50,000行を osbxl がわずか 0.1〜0.5秒で安全完走する詳細データを公開中。
+> 📈 **[最新！マルチプラットフォーム総合実測負荷テスト レポート (v2.0.0)](benchmarks/BENCHMARK_REPORT_LINUX_MAC.md)**: クラウド（GCP C3/C4）・macOS（Apple M4）における徹底検証。従来のライブラリが OOM で落ちる 50,000行を osbxl がわずか 0.1〜0.5秒で安全完走する詳細データを公開中。
 > 
 > **詳細な比較表・移行ガイドは [公式サイトのライブラリ比較ページ](https://osb-office.com/pages/comparison.php) をご覧ください。**
 
@@ -44,6 +44,8 @@ osbxl は、AI によるコード自動生成に対応した、C++ 製コアに�
   Excel 互換の 500 に近い関数、グラフ・チャート（縦棒・折れ線等）、オートフィルター、テーブル（ListObjects・集計行）、条件付き書式、ピボットテーブルをサポート。
 - **🔒 セキュリティ**:  
   パスワード付き・暗号化された `.xlsx` ファイルの読み込みおよび生成に対応。
+- **📄 高速・直接 PDF 出力 (v2.0.0 新機能)**:  
+  Excel ファイルを一時保存することなく、メモリバッファから直接 PDF を出力（`saveAsPdf` / `saveAsPdfToBuffer`）。Web API や Express 等でファイル I/O なしに直接 HTTP レスポンスとしてストリーミング配信可能です。
 
 ---
 
@@ -55,22 +57,45 @@ osbxl-samples/
 ├── README.ja.md            # 日本語版 README (本ファイル)
 ├── LICENSE                 # ライセンス条項 (英語版)
 ├── LICENSE.ja.md           # ライセンス条項 (日本語版)
-├── examples/               # 実行可能コードサンプル
-│   ├── python/             # Python サンプル
-│   │   ├── quickstart.py             # 基本操作 & 数式
-│   │   ├── chart_sample.py           # 縦棒 & 折れ線グラフ作成
-│   │   ├── table_comments_sample.py  # テーブル (ListObjects) & コメント
-│   │   └── conditional_format_sample.py # 条件付き書式 & データバー
+├── examples/               # 実行可能コードサンプル (全言語 01〜12章 網羅 & zeroBase 準拠)
 │   ├── nodejs/             # Node.js サンプル
-│   │   ├── quickstart.js             # 基本操作 & 数式
-│   │   ├── chart_sample.js           # 縦棒 & 折れ線グラフ作成
-│   │   └── table_comments_sample.js  # テーブル (ListObjects) & コメント
-│   ├── java/               # Java サンプル (QuickStart.java)
-│   ├── php/                # PHP サンプル (quickstart.php)
-│   └── wasm/               # WebAssembly サンプル (quickstart.wat, quickstart.wasm.js)
-├── ja/                     # 日本語版 Web 形式リファレンス (general-01 ~ 11)
-└── en/                     # 英語版 Web 形式リファレンス (general-01 ~ 11)
+│   │   ├── 01_overview.js 〜 12_pdf_export.js
+│   │   ├── 13_express_pdf_stream.js  # [注目] Express によるインメモリ PDF 直接ストリーミング
+│   │   └── README.md                 # Express PDF サーバーの起動・curl 検証手順
+│   ├── python/             # Python サンプル
+│   │   ├── 01_overview.py 〜 12_pdf_export.py
+│   │   ├── 13_fastapi_pdf_stream.py  # [注目] FastAPI によるインメモリ PDF 直接ストリーミング
+│   │   └── README.md                 # FastAPI PDF サーバーの起動・curl 検証手順
+│   ├── php/                # PHP サンプル
+│   │   ├── 01_overview.php 〜 12_pdf_export.php
+│   │   ├── 13_slim_pdf_stream.php    # [注目] Slim 4 によるインメモリ PDF 直接ストリーミング
+│   │   └── README.md                 # Slim 4 PDF サーバーの起動・curl 検証手順
+│   ├── java/               # Java サンプル
+│   │   ├── General01Overview.java 〜 General12PdfExport.java
+│   │   ├── spring-boot-pdf/          # [注目] Spring Boot によるインメモリ PDF 直接ストリーミング
+│   │   └── README.md                 # Spring Boot PDF サーバーのビルド・起動・curl 検証手順
+│   └── wasm/               # WebAssembly サンプル (01_overview.wasm.js 〜 12_pdf_export.wasm.js)
+├── ja/                     # 日本語版 Web 形式リファレンス (general-01 ~ 12)
+└── en/                     # 英語版 Web 形式リファレンス (general-01 ~ 12)
 ```
+
+### 🌟 注目の実践サンプル: Web API によるメモリ直接 PDF 配信 (v2.0.0)
+
+バージョン 2.0.0 の **PDF 直接ストリーミング** の実践例です。  
+一時ファイルを作らず、`wb.saveAsPdfToBuffer()` で取得したバイナリデータを HTTP POST レスポンスに直接パイプしてクライアントへ即時返却します。
+
+- **Node.js (Express)**:
+  - 👉 **[Express PDF 直接ストリーミング解説 (examples/nodejs/README.md)](examples/nodejs/README.md)**  
+  - 👉 **ソースコード: [`examples/nodejs/13_express_pdf_stream.js`](examples/nodejs/13_express_pdf_stream.js)**
+- **Python (FastAPI)**:
+  - 👉 **[FastAPI PDF 直接ストリーミング解説 (examples/python/README.md)](examples/python/README.md)**  
+  - 👉 **ソースコード: [`examples/python/13_fastapi_pdf_stream.py`](examples/python/13_fastapi_pdf_stream.py)**
+- **PHP (Slim 4)**:
+  - 👉 **[Slim 4 PDF 直接ストリーミング解説 (examples/php/README.md)](examples/php/README.md)**  
+  - 👉 **ソースコード: [`examples/php/13_slim_pdf_stream.php`](examples/php/13_slim_pdf_stream.php)**
+- **Java (Spring Boot)**:
+  - 👉 **[Spring Boot PDF 直接ストリーミング解説 (examples/java/README.md)](examples/java/README.md)**  
+  - 👉 **プロジェクト: [`examples/java/spring-boot-pdf/`](examples/java/spring-boot-pdf/)**
 
 ---
 
@@ -134,41 +159,189 @@ osbxl-samples/
 
 ---
 
-## 🚀 クイックコード例
+## 🚀 クイックコード例 (v2.0.0 メモリ直接 PDF 出力)
 
-### Python (`pyosbxl`)
+osbxl 2.0.0 の **インメモリ直接 PDF 出力 (`wb.saveAsPdfToBuffer`)** のコード例です。  
+ディスク一時ファイル保存ゼロで、Web サーバーの HTTP レスポンス等へそのままパイプ・返却できます。  
+（※全言語の実装や詳細オプションは、**[12章: PDF エクスポート (ja/general-12-pdf-export.md)](ja/general-12-pdf-export.md)** を参照してください）
 
-```python
-import pyosbxl
-
-app = pyosbxl.App()
-wb = app.createWorkBook("sales_report.xlsx")
-ws = wb.openWorkSheet("Sheet1")
-
-ws.getRange("A1").setValue("売上レポート")
-ws.getRange("A2").setValue(150000)
-ws.getRange("A3").setValue(230000)
-ws.getRange("A4").setFormula("SUM(A2:A3)")
-
-wb.save()
-wb.close()
-```
-
-### Node.js (`nodeosbxl`)
+### Node.js (Express)
 
 ```javascript
-const osbxl = require("nodeosbxl");
+const express = require("express");
+const { nodeosbxl, dto, enums } = require("nodeosbxl");
 
-const app = new osbxl.App();
-const wb = app.createWorkBook("report.xlsx");
-const ws = wb.addWorkSheet("Sheet1");
+const app = express();
 
-ws.getRange("A1").setNumberValue(100);
-ws.getRange("A2").setNumberValue(200);
-ws.getRange("A3").setFormula("SUM(A1:A2)");
+app.post("/api/export-pdf", (req, res) => {
+    const xlApp = new nodeosbxl.App();
+    const wb = xlApp.createWorkBook("report.xlsx");
+    const ws = wb.openWorkSheet(0); // 0 始まり (zeroBase)
 
-wb.save();
-wb.close();
+    ws.getRange("A1").setValue("2026年度 売上実績レポート");
+    ws.getCells(1, 0).setValue("四半期");
+    ws.getCells(1, 1).setValue("売上 (万円)");
+    ws.getCells(2, 0).setValue("第1四半期");
+    ws.getCells(2, 1).setNumberValue(150);
+    ws.getCells(3, 0).setValue("第2四半期");
+    ws.getCells(3, 1).setNumberValue(230);
+    ws.getCells(4, 0).setValue("合計");
+    ws.getCells(4, 1).setFormula("SUM(B3:B4)");
+
+    // A4 横向き・中央揃え
+    const ps = ws.getPageSetupObject();
+    ps.setPaperSize(enums.XlPaperSize.PaperA4);
+    ps.setOrientation(enums.XlPageOrientation.Landscape);
+    ps.setCenterHorizontally(true);
+    ws.setPageSetupObject(ps);
+
+    // PDF オプション (閲覧パスワード暗号化 & 印刷許可)
+    const pdfOpt = new dto.PdfExportObject();
+    pdfOpt.setOpenPassword("customer2026");
+    pdfOpt.setAllowPrint(true);
+
+    // ディスク保存ゼロでメモリ直接 PDF 生成
+    const pdfBuffer = wb.saveAsPdfToBuffer(false, ["Sheet1"], true, pdfOpt);
+    wb.close();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'attachment; filename="report.pdf"');
+    res.send(pdfBuffer);
+});
+
+app.listen(3000);
+```
+
+### Python (FastAPI)
+
+```python
+from fastapi import FastAPI, Response
+import pyosbxl
+from pyosbxl import dto, enums
+
+app = FastAPI()
+
+@app.post("/api/export-pdf")
+def export_pdf():
+    xl_app = pyosbxl.App()
+    wb = xl_app.createWorkBook("report.xlsx")
+    ws = wb.openWorkSheet(0)  # 0 始まり (zeroBase)
+
+    ws.getRange("A1").setValue("2026年度 売上実績レポート")
+    ws.getCells(1, 0).setValue("四半期")
+    ws.getCells(1, 1).setValue("売上 (万円)")
+    ws.getCells(2, 0).setValue("第1四半期")
+    ws.getCells(2, 1).setNumberValue(150)
+    ws.getCells(3, 0).setValue("第2四半期")
+    ws.getCells(3, 1).setNumberValue(230)
+    ws.getCells(4, 0).setValue("合計")
+    ws.getCells(4, 1).setFormula("SUM(B3:B4)")
+
+    ps = ws.getPageSetupObject()
+    ps.setPaperSize(enums.XlPaperSize.PaperA4)
+    ps.setOrientation(enums.XlPageOrientation.Landscape)
+    ps.setCenterHorizontally(True)
+    ws.setPageSetupObject(ps)
+
+    pdf_opt = dto.PdfExportObject()
+    pdf_opt.setOpenPassword("customer2026")
+    pdf_opt.setAllowPrint(True)
+
+    # メモリから bytes を直接取得
+    pdf_bytes = wb.saveAsPdfToBuffer(False, ["Sheet1"], True, pdf_opt)
+    wb.close()
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="report.pdf"'}
+    )
+```
+
+### PHP (Slim 4)
+
+```php
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use phposbxl\App;
+use phposbxl\enums\XlPaperSize;
+use phposbxl\enums\XlPageOrientation;
+use phposbxl\dto\PdfExportObject;
+
+$app->post('/api/export-pdf', function (Request $request, Response $response) {
+    $xlApp = new App();
+    $wb = $xlApp->createWorkBook("report.xlsx");
+    $ws = $wb->openWorkSheet(0); // 0 始まり (zeroBase)
+
+    $ws->getRange("A1")->setValue("2026年度 売上実績レポート");
+    $ws->getCells(1, 0)->setValue("四半期");
+    $ws->getCells(1, 1)->setValue("売上 (万円)");
+    $ws->getCells(2, 0)->setValue("第1四半期");
+    $ws->getCells(2, 1)->setNumberValue(150);
+    $ws->getCells(3, 0)->setValue("第2四半期");
+    $ws->getCells(3, 1)->setNumberValue(230);
+    $ws->getCells(4, 0)->setValue("合計");
+    $ws->getCells(4, 1)->setFormula("SUM(B3:B4)");
+
+    $ps = $ws->getPageSetupObject();
+    $ps->setPaperSize(XlPaperSize::PaperA4);
+    $ps->setOrientation(XlPageOrientation::Landscape);
+    $ps->setCenterHorizontally(true);
+    $ws->setPageSetupObject($ps);
+
+    $pdfOpt = new PdfExportObject();
+    $pdfOpt->setOpenPassword("customer2026");
+
+    $pdfData = $wb->saveAsPdfToBuffer(false, ["Sheet1"], true, $pdfOpt);
+    $wb->close();
+
+    $response->getBody()->write($pdfData);
+    return $response
+        ->withHeader('Content-Type', 'application/pdf')
+        ->withHeader('Content-Disposition', 'attachment; filename="report.pdf"');
+});
+```
+
+### Java (Spring Boot)
+
+```java
+@RestController
+public class PdfController {
+
+    @PostMapping("/api/export-pdf")
+    public ResponseEntity<byte[]> exportPdf() {
+        AppWrapper app = new AppWrapper();
+        WorkBookWrapper wb = app.createWorkBook("report.xlsx");
+        WorkSheetWrapper ws = wb.openWorkSheet(0); // 0 始まり (zeroBase)
+
+        ws.getRange("A1").setValue("2026年度 売上実績レポート");
+        ws.getCells(1, 0).setValue("四半期");
+        ws.getCells(1, 1).setValue("売上 (万円)");
+        ws.getCells(2, 0).setValue("第1四半期");
+        ws.getCells(2, 1).setNumberValue(150);
+        ws.getCells(3, 0).setValue("第2四半期");
+        ws.getCells(3, 1).setNumberValue(230);
+        ws.getCells(4, 0).setValue("合計");
+        ws.getCells(4, 1).setFormula("SUM(B3:B4)");
+
+        PageSetupObjectWrapper ps = ws.getPageSetupObject();
+        ps.setPaperSize(XlPaperSize.PaperA4);
+        ps.setOrientation(XlPageOrientation.Landscape);
+        ps.setCenterHorizontally(true);
+        ws.setPageSetupObject(ps);
+
+        PdfExportObjectWrapper pdfOpt = new PdfExportObjectWrapper();
+        pdfOpt.setOpenPassword("customer2026");
+
+        byte[] pdfBytes = wb.saveAsPdfToBuffer(false, Collections.singletonList("Sheet1"), true, pdfOpt);
+        wb.close();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"report.pdf\"")
+                .body(pdfBytes);
+    }
+}
 ```
 
 ---

@@ -1,10 +1,13 @@
 # High-Speed Bulk Input — setRangeData / setRangeFormulas
 
-level: intermediate ／ verified: 2026-10-11 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-06-bulk-input.md)
+level: intermediate ／ verified: 2026-10-17 ／ tabs: Node.js・Python・Java・PHP・WebAssembly ／ [日本語](../ja/general-06-bulk-input.md)
+
 
 ## What you want to do
 
+
 Write values and formulas into thousands or tens of thousands of cells **in one shot as a 2D matrix array** instead of calling `getCells()` per cell. Populate tabular data from CSV files or database query results into worksheets with maximum speed and minimal memory overhead.
+
 
 | Approach | What to use | Characteristics |
 | --- | --- | --- |
@@ -12,18 +15,24 @@ Write values and formulas into thousands or tens of thousands of cells **in one 
 | **2D array value input (Fastest, Recommended)** | `ws.setRangeData(startA1, data)` | **Fastest & Recommended.** Zero DTO creation overhead. Numeric strings are automatically saved as numeric cells. |
 | **2D array formula input (Fastest, Recommended)** | `ws.setRangeFormulas(startA1, formulas)` | **Fastest & Recommended.** Stream formulas across calculation columns at once (no leading "=" needed). |
 
+
 ## Classes covered
 
+
 ### `WorkSheet`
+
 
 | Method | Description |
 | --- | --- |
 | `setRangeData(startA1, data)` | Bulk enters 2D cell values (array of string rows/columns) from the top-left start cell (e.g., "A1"). |
-| `setRangeFormulas(startA1, formulas)` | Bulk enters 2D formulas (array of formula string rows/columns, no "=") from the top-left start cell (e.g., "C1"). |
+| `setRangeFormulas(startA1, formulas)` | Bulk enters 2D formulas (array of formula string rows/columns, no "=") from the top-left start cell (e.g., "D2"). |
+
 
 ## Code
 
+
 Output:
+
 
 #### [Node.js]
 
@@ -39,7 +48,7 @@ const ws = wb.openWorkSheet("Sheet1");
 // Prepare a 2D array of rows and columns as strings and write all at once starting from top-left cell.
 // Numeric strings like "100" are automatically stored as Excel numbers.
 const data = [
-    ["Product", "Price", "Qty"],
+    ["Product", "Price", "Qty", "Amount"],
     ["Apple", "100", "3"],
     ["Orange", "50", "6"],
     ["Grape", "150", "2"],
@@ -47,19 +56,19 @@ const data = [
 ws.setRangeData("A1", data);
 
 console.log("[1] After setRangeData:");
-for (const a1 of ["A1", "B2", "C2"]) {
+for (const a1 of ["A1", "B2", "C2", "D1"]) {
     console.log(`    ${a1} = ${JSON.stringify(ws.getRange(a1).getValue()[a1])}`);
 }
 
 // ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
 // Bulk input formulas across calculation columns (no leading "=" needed).
+// Populate formulas starting at row 2 (D2), leaving header (D1) intact.
 const formulas = [
-    ["Subtotal"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ];
-ws.setRangeFormulas("D1", formulas);
+ws.setRangeFormulas("D2", formulas);
 
 console.log("[2] After setRangeFormulas:");
 console.log("    Formulas D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getFormula()));
@@ -102,6 +111,7 @@ wb.save();
 wb.close();
 ```
 
+
 #### [Python]
 
 ```python
@@ -116,7 +126,7 @@ ws = wb.openWorkSheet("Sheet1")
 
 # ---------- 1. Bulk value input with 2D array (setRangeData) ----------
 data = [
-    ["Product", "Price", "Qty"],
+    ["Product", "Price", "Qty", "Amount"],
     ["Apple", "100", "3"],
     ["Orange", "50", "6"],
     ["Grape", "150", "2"],
@@ -124,17 +134,16 @@ data = [
 ws.setRangeData("A1", data)
 
 print("[1] After setRangeData:")
-for a1 in ["A1", "B2", "C2"]:
+for a1 in ["A1", "B2", "C2", "D1"]:
     print(f"    {a1} = {json.dumps(ws.getRange(a1).getValue()[a1], ensure_ascii=False)}")
 
 # ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
 formulas = [
-    ["Subtotal"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ]
-ws.setRangeFormulas("D1", formulas)
+ws.setRangeFormulas("D2", formulas)
 
 print("[2] After setRangeFormulas:")
 print("    Formulas D2:D4 =", json.dumps(ws.getRange("D2:D4").getFormula(), ensure_ascii=False))
@@ -172,6 +181,7 @@ wb.save()
 wb.close()
 ```
 
+
 #### [Java]
 
 ```java
@@ -181,13 +191,13 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        App app = new App();
+        AppWrapper app = new AppWrapper();
         WorkBookWrapper wb = app.createWorkBook("bulk-input.xlsx");
         WorkSheetWrapper ws = wb.openWorkSheet("Sheet1");
 
         // ---------- 1. Bulk value input with 2D array (setRangeData) ----------
         List<List<String>> data = Arrays.asList(
-            Arrays.asList("Product", "Price", "Qty"),
+            Arrays.asList("Product", "Price", "Qty", "Amount"),
             Arrays.asList("Apple", "100", "3"),
             Arrays.asList("Orange", "50", "6"),
             Arrays.asList("Grape", "150", "2")
@@ -195,18 +205,17 @@ public class Main {
         ws.setRangeData("A1", data);
 
         System.out.println("[1] After setRangeData:");
-        for (String a1 : Arrays.asList("A1", "B2", "C2")) {
+        for (String a1 : Arrays.asList("A1", "B2", "C2", "D1")) {
             System.out.println("    " + a1 + " = " + ws.getRange(a1).getValue().get(a1));
         }
 
         // ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
         List<List<String>> formulas = Arrays.asList(
-            Collections.singletonList("Subtotal"),
             Collections.singletonList("B2*C2"),
             Collections.singletonList("B3*C3"),
             Collections.singletonList("B4*C4")
         );
-        ws.setRangeFormulas("D1", formulas);
+        ws.setRangeFormulas("D2", formulas);
 
         System.out.println("[2] After setRangeFormulas:");
         System.out.println("    Formulas D2:D4 = " + ws.getRange("D2:D4").getFormula());
@@ -251,6 +260,7 @@ public class Main {
 }
 ```
 
+
 #### [PHP]
 
 ```php
@@ -263,7 +273,7 @@ $now = fn(): int => (int)(hrtime(true) / 1000000);   // ms
 
 // ---------- 1. Bulk value input with 2D array (setRangeData) ----------
 $data = [
-    ["Product", "Price", "Qty"],
+    ["Product", "Price", "Qty", "Amount"],
     ["Apple", "100", "3"],
     ["Orange", "50", "6"],
     ["Grape", "150", "2"],
@@ -271,18 +281,17 @@ $data = [
 $ws->setRangeData("A1", $data);
 
 echo "[1] After setRangeData:\n";
-foreach (["A1", "B2", "C2"] as $a1) {
+foreach (["A1", "B2", "C2", "D1"] as $a1) {
     echo "    {$a1} = ", json_encode($ws->getRange($a1)->getValue()[$a1], JSON_UNESCAPED_UNICODE), "\n";
 }
 
 // ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
 $formulas = [
-    ["Subtotal"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ];
-$ws->setRangeFormulas("D1", $formulas);
+$ws->setRangeFormulas("D2", $formulas);
 
 echo "[2] After setRangeFormulas:\n";
 echo "    Formulas D2:D4 = ", json_encode($ws->getRange("D2:D4")->getFormula(), JSON_UNESCAPED_UNICODE), "\n";
@@ -326,6 +335,7 @@ $wb->save();
 $wb->close();
 ```
 
+
 #### [WebAssembly]
 
 ```javascript
@@ -336,7 +346,7 @@ const ws = wb.openWorkSheet("Sheet1");
 
 // ---------- 1. Bulk value input with 2D array (setRangeData) ----------
 const data = [
-    ["Product", "Price", "Qty"],
+    ["Product", "Price", "Qty", "Amount"],
     ["Apple", "100", "3"],
     ["Orange", "50", "6"],
     ["Grape", "150", "2"],
@@ -344,18 +354,17 @@ const data = [
 ws.setRangeData("A1", data);
 
 console.log("[1] After setRangeData:");
-for (const a1 of ["A1", "B2", "C2"]) {
+for (const a1 of ["A1", "B2", "C2", "D1"]) {
     console.log(`    ${a1} = ${JSON.stringify(ws.getRange(a1).getValue()[a1])}`);
 }
 
 // ---------- 2. Bulk formula input with 2D array (setRangeFormulas) ----------
 const formulas = [
-    ["Subtotal"],
     ["B2*C2"],
     ["B3*C3"],
     ["B4*C4"],
 ];
-ws.setRangeFormulas("D1", formulas);
+ws.setRangeFormulas("D2", formulas);
 
 console.log("[2] After setRangeFormulas:");
 console.log("    Formulas D2:D4 =", JSON.stringify(ws.getRange("D2:D4").getFormula()));
@@ -398,33 +407,44 @@ wb.save();
 wb.close();
 ```
 
-```plaintext
-[1] After setRangeData:
+
+`[1] After setRangeData:
     A1 = "Product"
     B2 = 100
     C2 = 3
+    D1 = "Amount"
 [2] After setRangeFormulas:
     Formulas D2:D4 = {"D2":"B2*C2","D3":"B3*C3","D4":"B4*C4"}
     Values   D2:D4 = {"D2":300,"D3":300,"D4":300}
 [3] Performance for 10000 cells:
-    Per-cell getCells().setNumberValue() : 102 ms
-    setRangeData (build 2 + write 18) : 20 ms (fastest)
-[Verification] Both match E2000 = 200005
-```
+    Per-cell getCells().setNumberValue() : 72 ms
+    setRangeData (build 2 + write 25) : 27 ms (fastest)
+[Verification] Both match E2000 = 200005`
 
-`[3]` execution time varies depending on the runtime environment.
+`[3]` execution time varies depending on the runtime environment (the above is an actual sample run on hardware).
 
-## Explanation
+
+## Notes
+
 
 ### Speed and Performance
 
-| Cell Count | Per-cell `getCells().setNumberValue()` | `setRangeData()` | Speedup |
-| --- | --- | --- | --- |
-| 10,000 (2,000 rows x 5 cols) | ~102 ms | ~20 ms (build 2 + write 18) | **~5x faster** |
-| 100,000 (20,000 rows x 5 cols) | ~1,390 ms | ~195 ms (build 15 + write 180) | **~7x faster** |
-| 200,000 (50,000 rows x 4 cols) | ~3,200 ms | ~380 ms | **~8.4x faster** |
+
+Measured input performance under identical environment (Linux x86_64 / Intel Xeon / Python and PHP benchmark test runs):
+
+
+| Scale (Cells) | Per-cell `getCells().setNumberValue()` | `setRangeData()` (2D Bulk Array) | Speedup | Practical Advantage |
+| --- | --- | --- | --- | --- |
+| **10,000 cells**<br>2,000 rows x 5 cols | ~72 – 185 ms | **~27 – 95 ms**<br>(incl. array build) | **~2x – 2.7x faster** | Web API downloads complete in under 0.1 seconds without user wait. |
+| **100,000 cells**<br>20,000 rows x 5 cols | ~960 – 1,300 ms | **~280 – 350 ms** | **~3x – 4.7x faster** | Populate massive datasets of 100k cells in ~0.3 seconds. |
+| **200,000 cells**<br>50,000 rows x 4 cols | ~2,200 – 2,400 ms | **~570 – 630 ms** | **~3.5x – 4.1x faster** | Completes safely with low memory where legacy OSS libraries crash with OOM. |
+
+
+※ For full platform benchmark reports (GCP C3/C4, macOS M4, Windows 11) including file write and formula recalculation, see the [Cross-Platform Benchmark Report](/en/pages/benchmark_report.md).
+
 
 `setRangeData()` minimizes language-boundary crossing overhead and performs direct SST (Shared String Table) registration and cell placement inside C++, widening the performance gap as cell count grows.
+
 
 ### Best Practices
 
@@ -432,24 +452,16 @@ wb.close();
 * **Generating Calculation Columns** — Stream formulas row by row with `ws.setRangeFormulas("D2", [["B2*C2"], ["B3*C3"], ...])`.
 * **When Writing Hundreds or More Cells** — Using `setRangeData()` / `setRangeFormulas()` is strongly recommended over per-cell setters.
 
-## Notes
+
+## Caveats
 
 * **Specify the top-left start cell.** The first argument (e.g. `"A1"` or `"B5"`) acts as the anchor point from which the 2D matrix expands across rows and columns.
 * **Numeric strings are automatically saved as numeric cells.** Strings that represent valid numbers (e.g., `"100"`, `"-12.5"`) are recognized as numeric cells in Excel and can be calculated by functions like SUM.
 * **Do not prefix formulas with `=`.** Write `setRangeFormulas("D2", [["B2*C2"]])`.
 
-## Related
+
+## See also
 
 * [Index](index.md)
 * Previous: [Rows, Columns, and Ranges](general-05-rows-cols.md) / Next: [AutoFilter and Sort](general-07-autofilter-sort.md)
-* API Reference
-
-  #### [Node.js]
-
-  #### [Python]
-
-  #### [Java]
-
-  #### [PHP]
-
-  #### [WebAssembly]
+* API Reference             <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 active border-primary-600 text-primary-600" data-tab="node">Node.js</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="python">Python</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="java">Java</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="php">PHP</button>     <button class="tab-btn px-4 py-2 text-sm font-bold border-b-2 border-transparent text-text-light hover:text-primary-600" data-tab="wasm">WebAssembly</button>          [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/nodejs/classes/nodeosbxl.WorkSheet.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/python/pyosbxl.WorkSheet.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/java/com/osboffice/osbxl/WorkSheetWrapper.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/php/classes/phposbxl-WorkSheet.html)     [WorkSheet (setRangeData / setRangeFormulas)](/api-docs/wasm/classes/osbxl.WorkSheet.html)

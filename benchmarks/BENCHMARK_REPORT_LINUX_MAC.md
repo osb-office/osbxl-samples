@@ -5,7 +5,7 @@
 
 - **公開リポジトリ**: [osb-office/osbxl-samples](https://github.com/osb-office/osbxl-samples)
 - **測定日**: 2026年11月6日（GCP C3/C4 / macOS M4 最新ビルド実測反映）
-- **osbxl バージョン**: **`v1.5.1`** (nodeosbxl / pyosbxl / phposbxl / osbxl Java)
+- **osbxl バージョン**: **`v2.0.0`** (nodeosbxl / pyosbxl / phposbxl / osbxl Java)
 - **対象ライブラリ**:
   - **PHP 系**: `PhpSpreadsheet` vs `phposbxl (v2.0.0)`
   - **Python 系**: `openpyxl` vs `pyosbxl (v2.0.0)`
