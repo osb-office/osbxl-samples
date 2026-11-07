@@ -344,6 +344,14 @@ public class PdfController {
 }
 ```
 
+### 📷 出力結果プレビュー
+
+上記 Web サーバーから返却された PDF（開封パスワード: `customer2026`）の実際のレンダリング画像です。データテーブル（合計行付き）と集合縦棒グラフが A4 横向きで美しくレイアウトされて出力されます：
+
+[![売上実績レポート PDF 出力プレビュー](assets/images/sales_report_pdf_preview.png)](assets/images/sales_report_pdf_preview.png)
+
+👉 **詳細な作成手順・オプション解説はこちら: [12章: PDF エクスポート (ja/general-12-pdf-export.md)](ja/general-12-pdf-export.md)**
+
 ---
 
 ## 🔗 公式リンク・リソース

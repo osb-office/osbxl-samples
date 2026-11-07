@@ -337,6 +337,14 @@ public class PdfController {
 }
 ```
 
+### 📷 Output PDF Preview
+
+Actual rendered preview of the PDF (open password: `customer2026`) streamed directly from memory. The structured data table and clustered column chart are rendered cleanly side-by-side in A4 landscape:
+
+[![Sales Report PDF Preview](assets/images/sales_report_pdf_preview.png)](assets/images/sales_report_pdf_preview.png)
+
+👉 **For detailed implementation and options, see [Chapter 12: PDF Export (en/general-12-pdf-export.md)](en/general-12-pdf-export.md)**
+
 ---
 
 ## 🔗 Official Links & Documentation
