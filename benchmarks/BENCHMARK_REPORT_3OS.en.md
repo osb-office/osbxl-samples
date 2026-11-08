@@ -4,7 +4,7 @@
 > **[🇯🇵 日本語版レポートはこちら (BENCHMARK_REPORT_3OS.md)](BENCHMARK_REPORT_3OS.md)**
 
 - **Public Repository**: [osb-office/osbxl-samples](https://github.com/osb-office/osbxl-samples)
-- **Measurement Date**: October 18, 2026 (Reflecting latest GCP C3/C4 measurements)
+- **Measurement Date**: November 8, 2026 (Reflecting latest GCP C3/C4 / macOS M4 / Windows 11 measurements)
 - **osbxl Version**: **`v2.0.1`** (nodeosbxl / pyosbxl / phposbxl / osbxl Java)
 - **Benchmark Target Libraries**:
   - **PHP Ecosystem**: `PhpSpreadsheet` vs `phposbxl (v2.0.1)`
