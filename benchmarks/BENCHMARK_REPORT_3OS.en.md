@@ -1,20 +1,21 @@
 # [Technical Benchmark Report] Multi-Platform Comprehensive Stress Test & Architecture Deep Dive: 4 Excel Library Families
-## ~ Performance Limits & Behavioral Verification across Cloud (GCP C3/C4), Linux (x86_64) & macOS (Apple M4) ~
+## ~ Performance Limits & Behavioral Verification across Cloud (GCP C3/C4), macOS (Apple M4), Windows & Linux ~
 
-> **[🇯🇵 日本語版レポートはこちら (BENCHMARK_REPORT_LINUX_MAC.md)](BENCHMARK_REPORT_LINUX_MAC.md)**
+> **[🇯🇵 日本語版レポートはこちら (BENCHMARK_REPORT_3OS.md)](BENCHMARK_REPORT_3OS.md)**
 
 - **Public Repository**: [osb-office/osbxl-samples](https://github.com/osb-office/osbxl-samples)
 - **Measurement Date**: October 18, 2026 (Reflecting latest GCP C3/C4 measurements)
-- **osbxl Version**: **`v2.0.0`** (nodeosbxl / pyosbxl / phposbxl / osbxl Java)
+- **osbxl Version**: **`v2.0.1`** (nodeosbxl / pyosbxl / phposbxl / osbxl Java)
 - **Benchmark Target Libraries**:
-  - **PHP Ecosystem**: `PhpSpreadsheet` vs `phposbxl (v2.0.0)`
-  - **Python Ecosystem**: `openpyxl` vs `pyosbxl (v2.0.0)`
-  - **Node.js Ecosystem**: `ExcelJS` vs `nodeosbxl (v2.0.0)`
-  - **Java Ecosystem**: `Apache POI (XSSF)` vs `osbxl Java (v2.0.0)`
+  - **PHP Ecosystem**: `PhpSpreadsheet` vs `phposbxl (v2.0.1)`
+  - **Python Ecosystem**: `openpyxl` vs `pyosbxl (v2.0.1)`
+  - **Node.js Ecosystem**: `ExcelJS` vs `nodeosbxl (v2.0.1)`
+  - **Java Ecosystem**: `Apache POI (XSSF)` vs `osbxl Java (v2.0.1)`
 - **Target Environments & Platforms**:
   1. **GCP C4 (Latest Cloud VM)**: Intel Xeon Platinum 8581C (5th Gen Emerald Rapids, 4 vCPU) / Ubuntu 24.04 LTS
   2. **GCP C3 (Prior Gen Cloud VM)**: Intel Xeon Platinum 8481C (4th Gen Sapphire Rapids, 4 vCPU) / Linux
   3. **macOS (Development Desktop)**: Apple M4 mini (10 cores: 4P+6E, 16GB Unified Memory) / macOS Darwin arm64
+  4. **Windows (Development Desktop)**: Intel Core / x86_64 / Windows 11
 - **Latest Runtime Environments**:
   - **PHP**: `8.5.11` (NTS, ext-zlib enabled, mise)
   - **Python**: `3.14.8` (pyenv)
@@ -37,7 +38,7 @@ In web applications and enterprise batch systems, generating Excel reports has p
 1. **"Processes crashing immediately from Out Of Memory (OOM) as data rows increase."**
 2. **"Web servers timing out due to tens of seconds spent serializing XML/ZIP files."**
 
-To address these pain points, we conducted exhaustive benchmark stress tests comparing standard high-level libraries with `osbxl` across **4 major programming languages (PHP, Python, Node.js, Java)** and **2 representative platforms (Linux: cloud GCP C3/C4, macOS: Apple M4)** under strictly identical data schemas and latest runtimes.
+To address these pain points, we conducted exhaustive benchmark stress tests comparing standard high-level libraries with `osbxl` across **4 major programming languages (PHP, Python, Node.js, Java)** and **3 representative platforms (Linux: cloud GCP C3/C4, macOS: Apple M4, Windows: Intel Core / Windows 11)** under strictly identical data schemas and latest runtimes.
 
 ---
 
@@ -435,6 +436,91 @@ Java 200r | 0.303s (  8.6KB)        |  0.010s ( 12.3KB)      |  0.013s ( 13.8KB)
 ```
 
 ---
+
+---
+
+### [4] Windows (Intel Core / x86_64 / Windows 11)
+
+```text
+﻿========================================================================================================
+実行日時 : 2026-11-08 14:19:49
+マシン   : Windows x86_64
+Node.js  : v22.23.3
+Python   : Python 3.14.7
+PHP      : PHP 8.5.11 (cli) (built: Sep 22 2026 13:51:38) (NTS Visual C++ 2022 x64)
+Java     : java version "1.8.0_381"
+osbxl    : v2.0.1 (nodeosbxl / pyosbxl / phposbxl / osbxl Java)
+集計方法 : 全 10 回試行の各セル最良値 (Best of 10)
+========================================================================================================
+
+[1] PHP 系: PhpSpreadsheet vs phposbxl
+行数        | PhpSpreadsheet (A)      | phposbxl (True) (B)     | phposbxl (False) (C)    |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 行 | 0.165s ( 18.7KB)        | 0.011s ( 20.9KB)        | 0.020s ( 24.0KB)        |    15.00倍 |    8.25倍
+  1000 行 | 0.274s ( 31.0KB)        | 0.014s ( 35.2KB)        | 0.029s ( 40.8KB)        |    19.57倍 |    9.45倍
+  5000 行 | 1.184s (134.1KB)        | 0.040s (152.6KB)        | 0.113s (184.2KB)        |    29.60倍 |   10.48倍
+ 10000 行 | 2.341s (262.6KB)        | 0.075s (299.8KB)        | 0.225s (363.0KB)        |    31.21倍 |   10.40倍
+ 50000 行 | OOM (メモリ枯渇)             | 0.375s (1479.8KB)       | 1.171s (1790.6KB)       |   完走(OOM) |  完走(OOM)
+
+[2] Python 系: openpyxl vs pyosbxl
+行数        | openpyxl (A)            | pyosbxl (True) (B)      | pyosbxl (False) (C)     |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 行 | 0.036s ( 16.4KB)        | 0.016s ( 20.9KB)        | 0.025s ( 24.0KB)        |     2.25倍 |    1.44倍
+  1000 行 | 0.057s ( 27.7KB)        | 0.019s ( 35.2KB)        | 0.036s ( 40.8KB)        |     3.00倍 |    1.58倍
+  5000 行 | 0.209s (117.4KB)        | 0.047s (152.6KB)        | 0.121s (184.2KB)        |     4.45倍 |    1.73倍
+ 10000 行 | 0.404s (229.4KB)        | 0.084s (299.8KB)        | 0.236s (362.9KB)        |     4.81倍 |    1.71倍
+ 50000 行 | 2.047s (1115.3KB)       | 0.398s (1479.8KB)       | 1.204s (1790.6KB)       |     5.14倍 |    1.70倍
+
+[3] Node.js 系: ExcelJS vs nodeosbxl
+行数        | ExcelJS (A)             | nodeosbxl (True) (B)    | nodeosbxl (False) (C)   |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 行 | 0.063s ( 19.1KB)        | 0.013s ( 20.9KB)        | 0.022s ( 24.0KB)        |     4.85倍 |    2.86倍
+  1000 行 | 0.096s ( 31.9KB)        | 0.016s ( 35.2KB)        | 0.032s ( 40.8KB)        |     6.00倍 |    3.00倍
+  5000 行 | 0.211s (134.7KB)        | 0.041s (152.6KB)        | 0.114s (184.2KB)        |     5.15倍 |    1.85倍
+ 10000 行 | 0.328s (263.0KB)        | 0.074s (299.8KB)        | 0.224s (362.9KB)        |     4.43倍 |    1.46倍
+ 50000 行 | 1.207s (1299.6KB)       | 0.366s (1479.8KB)       | 1.161s (1790.6KB)       |     3.30倍 |    1.04倍
+
+[4] Java 系: Apache POI (XSSF) vs osbxl(Java)
+行数        | Apache POI (A)          | osbxl (True) (B)        | osbxl (False) (C)       |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   500 行 | 0.666s ( 16.2KB)        | 0.023s ( 20.9KB)        | 0.029s ( 24.0KB)        |    28.96倍 |   22.97倍
+  1000 行 | 0.714s ( 29.1KB)        | 0.025s ( 35.2KB)        | 0.040s ( 40.8KB)        |    28.56倍 |   17.85倍
+  5000 行 | 1.049s (131.5KB)        | 0.063s (152.6KB)        | 0.133s (184.2KB)        |    16.65倍 |    7.89倍
+ 10000 行 | 1.338s (259.9KB)        | 0.104s (299.8KB)        | 0.239s (362.9KB)        |    12.87倍 |    5.60倍
+ 50000 行 | OOM (ヒープ枯渇)             | 0.411s (1479.8KB)       | 1.149s (1790.6KB)       |   完走(OOM) |  完走(OOM)
+
+========================================================================================================
+  【追加参考データ】小規模ケース (100行・200行) 実測結果
+========================================================================================================
+
+  [参考 1] PHP 系: PhpSpreadsheet vs phposbxl (100行・200行)
+行数        | PhpSpreadsheet (A)      | phposbxl (True) (B)     | phposbxl (False) (C)    |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   100 行 |  0.077s (  8.8KB)       |  0.009s (  9.2KB)       |  0.014s ( 10.2KB)       |     8.32倍 |    5.58倍
+   200 行 |  0.099s ( 11.4KB)       |  0.009s ( 12.3KB)       |  0.015s ( 13.8KB)       |    10.63倍 |    6.55倍
+
+  [参考 2] Python 系: openpyxl vs pyosbxl (100行・200行)
+行数        | openpyxl (A)            | pyosbxl (True) (B)      | pyosbxl (False) (C)     |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   100 行 |  0.020s (  7.3KB)       |  0.014s (  9.2KB)       |  0.019s ( 10.2KB)       |     1.47倍 |    1.10倍
+   200 行 |  0.025s (  9.7KB)       |  0.014s ( 12.3KB)       |  0.020s ( 13.8KB)       |     1.78倍 |    1.28倍
+
+  [参考 3] Node.js 系: ExcelJS vs nodeosbxl (100行・200行)
+行数        | ExcelJS (A)             | nodeosbxl (True) (B)    | nodeosbxl (False) (C)   |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   100 行 |  0.041s (  9.0KB)       |  0.010s (  9.2KB)       |  0.015s ( 10.2KB)       |     3.97倍 |    2.82倍
+   200 行 |  0.047s ( 11.6KB)       |  0.011s ( 12.3KB)       |  0.015s ( 13.8KB)       |     4.42倍 |    3.11倍
+
+  [参考 4] Java 系: Apache POI (XSSF) vs osbxl(Java) (100行・200行)
+行数        | Apache POI (A)          | osbxl (True) (B)        | osbxl (False) (C)       |   (A)/(B) |  (A)/(C)
+----------+-------------------------+-------------------------+-------------------------+-----------+----------
+   100 行 |  0.545s (  5.9KB)       |  0.032s (  9.2KB)       |  0.023s ( 10.2KB)       |    17.03倍 |   23.70倍
+   200 行 |  0.585s (  8.6KB)       |  0.031s ( 12.3KB)       |  0.031s ( 13.8KB)       |    18.87倍 |   18.87倍
+
+========================================================================================================
+ベンチマーク測定終了
+========================================================================================================
+```
 
 ---
 

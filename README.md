@@ -14,7 +14,7 @@ Official verified code samples and patterns for **[osbxl (https://osb-office.com
 
 ## 📊 Comparison with Popular Excel Libraries
 
-> 📈 **[New! Multi-Platform Benchmark Report (v2.0.0)](benchmarks/BENCHMARK_REPORT_LINUX_MAC.en.md)**: Real-world stress testing across GCP C3/C4 and macOS M4. See how osbxl completes 50,000 rows in just 0.1s–0.5s where Apache POI and PhpSpreadsheet crash with OOM.
+> 📈 **[New! Multi-Platform Benchmark Report (v2.0.0)](benchmarks/BENCHMARK_REPORT_3OS.en.md)**: Real-world stress testing across GCP C3/C4 and macOS M4. See how osbxl completes 50,000 rows in just 0.1s–0.5s where Apache POI and PhpSpreadsheet crash with OOM.
 > 
 > **For in-depth analysis and migration tips, check out our [Online Library Comparison Guide](https://osb-office.com/en/pages/comparison.php).**
 

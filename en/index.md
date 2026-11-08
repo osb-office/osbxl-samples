@@ -4,7 +4,7 @@
 
 > Comprehensive benchmark comparison and architectural analysis evaluating the performance limits of 4 languages (PHP / Python / Node.js / Java) against existing OSS (Apache POI / openpyxl / PhpSpreadsheet / ExcelJS) across Cloud (GCP C3/C4), Linux and macOS (Apple M4).  
 > 
-> 👉 **[Read the Full Technical Benchmark Report](../benchmarks/BENCHMARK_REPORT_LINUX_MAC.en.md)**
+> 👉 **[Read the Full Technical Benchmark Report](../benchmarks/BENCHMARK_REPORT_3OS.en.md)**
 
 These osbxl samples have all been executed and verified. The code on each page runs as-is. Every code block switches between **five language tabs — Node.js / Python / Java / PHP / WebAssembly** — and the install instructions shown per tab are language-specific too.
 
@@ -33,7 +33,7 @@ These osbxl samples have all been executed and verified. The code on each page r
 | Aggregate with pivot tables | [general-11 Pivot tables](general-11-pivottables.md) |
 | Export Excel to PDF (page setup, margins, print area) | [general-12 PDF Export](general-12-pdf-export.md) |
 | Detailed Feature Comparison & Benchmarks vs POI / openpyxl / PHP | [Benchmark Comparison Report](benchmark-comparison.md) |
-| Linux / macOS (M4) Stress Benchmark (500 to 50k rows) | [Linux & macOS Benchmark & Architecture Report](../benchmarks/BENCHMARK_REPORT_LINUX_MAC.en.md) |
+| Linux / macOS (M4) Stress Benchmark (500 to 50k rows) | [Linux & macOS Benchmark & Architecture Report](../benchmarks/BENCHMARK_REPORT_3OS.en.md) |
 
 ## general — overview and basic operations
 
