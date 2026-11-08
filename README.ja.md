@@ -350,6 +350,12 @@ public class PdfController {
 
 [![売上実績レポート PDF 出力プレビュー](assets/images/sales_report_pdf_preview.png)](assets/images/sales_report_pdf_preview.png)
 
+#### 📄 電子透かし（印影署名）付き請求書プレビュー (v2.0.1 新機能)
+
+電子透かしを伴った、請求書の例です。
+
+[![電子透かしを伴った、請求書の例](assets/images/invoice_pdf_watermark_preview.png)](assets/images/invoice_pdf_watermark_preview.png)
+
 👉 **詳細な作成手順・オプション解説はこちら: [12章: PDF エクスポート (ja/general-12-pdf-export.md)](ja/general-12-pdf-export.md)**
 
 ---

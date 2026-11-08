@@ -343,6 +343,12 @@ Actual rendered preview of the PDF (open password: `customer2026`) streamed dire
 
 [![Sales Report PDF Preview](assets/images/sales_report_pdf_preview.png)](assets/images/sales_report_pdf_preview.png)
 
+#### 📄 Invoice PDF with Digital Watermark / Stamp (New in v2.0.1)
+
+電子透かしを伴った、請求書の例です。
+
+[![Invoice with Digital Watermark Preview](assets/images/invoice_pdf_watermark_preview.png)](assets/images/invoice_pdf_watermark_preview.png)
+
 👉 **For detailed implementation and options, see [Chapter 12: PDF Export (en/general-12-pdf-export.md)](en/general-12-pdf-export.md)**
 
 ---
