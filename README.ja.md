@@ -79,9 +79,9 @@ osbxl-samples/
 └── en/                     # 英語版 Web 形式リファレンス (general-01 ~ 12)
 ```
 
-### 🌟 注目の実践サンプル: Web API によるメモリ直接 PDF 配信 (v2.0.0)
+### 🌟 注目の実践サンプル: Web API によるメモリ直接 PDF 配信 (v2.0.1)
 
-バージョン 2.0.0 の **PDF 直接ストリーミング** の実践例です。  
+バージョン 2.0.1 の **PDF 直接ストリーミング** の実践例です。  
 一時ファイルを作らず、`wb.saveAsPdfToBuffer()` で取得したバイナリデータを HTTP POST レスポンスに直接パイプしてクライアントへ即時返却します。
 
 - **Node.js (Express)**:
@@ -159,9 +159,9 @@ osbxl-samples/
 
 ---
 
-## 🚀 クイックコード例 (v2.0.0 メモリ直接 PDF 出力)
+## 🚀 クイックコード例 (v2.0.1 メモリ直接 PDF 出力)
 
-osbxl 2.0.0 の **インメモリ直接 PDF 出力 (`wb.saveAsPdfToBuffer`)** のコード例です。  
+osbxl 2.0.1 の **インメモリ直接 PDF 出力 (`wb.saveAsPdfToBuffer`)** のコード例です。  
 ディスク一時ファイル保存ゼロで、Web サーバーの HTTP レスポンス等へそのままパイプ・返却できます。  
 （※全言語の実装や詳細オプションは、**[12章: PDF エクスポート (ja/general-12-pdf-export.md)](ja/general-12-pdf-export.md)** を参照してください）
 

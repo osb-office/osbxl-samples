@@ -72,9 +72,9 @@ osbxl-samples/
 └── en/                     # English Web Reference (general-01 ~ 12)
 ```
 
-### 🌟 Featured Real-World Samples: Direct In-Memory PDF Streaming via Web APIs (v2.0.0)
+### 🌟 Featured Real-World Samples: Direct In-Memory PDF Streaming via Web APIs (v2.0.1)
 
-Practical examples of osbxl v2.0.0 **direct PDF streaming**.  
+Practical examples of osbxl v2.0.1 **direct PDF streaming**.  
 Without creating any temporary disk files, `wb.saveAsPdfToBuffer()` generates the PDF in memory and streams it directly through an HTTP POST response to the client.
 
 - **Node.js (Express)**:
@@ -152,9 +152,9 @@ Stress test results scaling data up to **50,000 rows × 4 columns = 200,000 cell
 
 ---
 
-## 🚀 Quick Code Examples (v2.0.0 Direct In-Memory PDF Streaming)
+## 🚀 Quick Code Examples (v2.0.1 Direct In-Memory PDF Streaming)
 
-A premier feature of osbxl 2.0.0 is native **direct in-memory PDF streaming (`wb.saveAsPdfToBuffer`)**.  
+A premier feature of osbxl 2.0.1 is native **direct in-memory PDF streaming (`wb.saveAsPdfToBuffer`)**.  
 Without creating temporary files on disk, binary data can be piped straight into HTTP responses across modern Web frameworks.  
 *(For all language implementations and advanced options, please refer to **[Chapter 12: PDF Export (en/general-12-pdf-export.md)](en/general-12-pdf-export.md)**)*
 
