@@ -350,7 +350,7 @@ public class PdfController {
 
 [![売上実績レポート PDF 出力プレビュー](assets/images/sales_report_pdf_preview.png)](assets/images/sales_report_pdf_preview.png)
 
-#### 📄 電子透かし（印影署名）付き請求書プレビュー (v2.0.1 新機能)
+#### 📄 OSBXLで作成した電子透かし・電子署名付き PDF (v2.0.1 新機能)
 
 電子透かしを伴った、請求書の例です。
 

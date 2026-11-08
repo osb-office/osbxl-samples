@@ -343,7 +343,7 @@ Actual rendered preview of the PDF (open password: `customer2026`) streamed dire
 
 [![Sales Report PDF Preview](assets/images/sales_report_pdf_preview.png)](assets/images/sales_report_pdf_preview.png)
 
-#### 📄 Invoice PDF with Digital Watermark / Stamp (New in v2.0.1)
+#### 📄 Invoice PDF with Digital Watermark & Signature Created with OSBXL (New in v2.0.1)
 
 An example of an invoice PDF rendered with an embedded digital watermark (stamp).
 
