@@ -345,7 +345,7 @@ Actual rendered preview of the PDF (open password: `customer2026`) streamed dire
 
 #### 📄 Invoice PDF with Digital Watermark / Stamp (New in v2.0.1)
 
-電子透かしを伴った、請求書の例です。
+An example of an invoice PDF rendered with an embedded digital watermark (stamp).
 
 [![Invoice with Digital Watermark Preview](assets/images/invoice_pdf_watermark_preview.png)](assets/images/invoice_pdf_watermark_preview.png)
 
